@@ -13,7 +13,6 @@ export default (): RedisClientType => {
         rejectUnauthorized: process.env.REDIS_TLS_REJECT_UNAUTHORIZED === 'true',
       }),
       keepAlive: 5000,
-      pingInterval: 30000,
       reconnectStrategy: (retries) => {
         if (retries > 20) {
           strapi.log.error('Redis: too many reconnection attempts, giving up');
@@ -46,6 +45,10 @@ export default (): RedisClientType => {
   (async () => {
     try {
       await client.connect();
+      // Send PING every 30s to prevent Heroku Redis idle disconnects
+      setInterval(() => {
+        client.ping().catch(() => {});
+      }, 30000);
     } catch (err) {
       strapi.log.error('Failed to connect to Redis:', (err as Error).message);
     }
