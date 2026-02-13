@@ -120,8 +120,8 @@ export async function calculateCartTotal(strapi: any, cartItems: any[]): Promise
       : [],
   ]);
 
-  const productMap = new Map(products.map((p: any) => [p.id, p]));
-  const partMap = new Map(parts.map((p: any) => [p.id, p]));
+  const productMap = new Map<number, any>(products.map((p: any) => [p.id, p]));
+  const partMap = new Map<number, any>(parts.map((p: any) => [p.id, p]));
 
   let total = 0;
   for (const item of cartItems) {

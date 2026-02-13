@@ -174,7 +174,7 @@ export default factories.createCoreController("api::cart.cart", ({ strapi }) => 
         return this.transformResponse(newCart);
       }
 
-      const cart = carts[0];
+      const cart = carts[0] as any;
       cart.total = await calculateCartTotal(strapi, cart.cart_items || []);
       return this.transformResponse(cart);
     } catch (error) {
