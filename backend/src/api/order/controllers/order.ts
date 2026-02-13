@@ -120,65 +120,59 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
       }
 
       const currentDate = new Date().toISOString().split('T')[0];
-      const orderItemsData: OrderItemInput[] = await Promise.all(data.order_items.map(async (item: any) => {
-        const product = await strapi.entityService.findOne('api::product.product', item.product, {
-          populate: ['promotions'],
-        });
-        
+
+      // Batch-load all unique products once (instead of 3 fetches per item)
+      const uniqueProductIds = [...new Set(data.order_items.map((item: any) => item.product))];
+      const productsArray = await strapi.db.query('api::product.product').findMany({
+        where: { id: { $in: uniqueProductIds } },
+        populate: ['promotions'],
+      });
+      const productMap = new Map(productsArray.map((p: any) => [p.id, p]));
+
+      let totalDiscountCents = 0;
+      const orderItemsWithBasePrice = data.order_items.map((item: any) => {
+        const product = productMap.get(item.product);
+
         // Find the matching cart item to get is_additional_part flag
         const cartItem = item.cart_item_id
           ? cart.cart_items.find((ci: CartItem) => ci.id.toString() === item.cart_item_id)
           : cart.cart_items.find((ci: CartItem) => ci.product.id === item.product);
-        
-        // For additional parts, don't apply product-level promotions
+
         const isAdditionalPart = cartItem?.is_additional_part || false;
-        const activePromotions = isAdditionalPart ? [] : filterActivePromotions(product.promotions, currentDate);
-        
-        const priceCents = item.price || Math.round(product.effective_price * 100);
+        const activePromotions = isAdditionalPart ? [] : filterActivePromotions(product?.promotions || [], currentDate);
+
+        const priceCents = item.price || Math.round((product?.effective_price || 0) * 100);
+
+        // Calculate base price and discount
+        let basePriceCents: number;
+        if (isAdditionalPart) {
+          basePriceCents = cartItem ? Math.round(parseFloat(cartItem.base_price) * 100) : priceCents;
+        } else {
+          basePriceCents = product ? Math.round(product.default_price * 100) : priceCents;
+        }
+        const itemDiscountCents = (basePriceCents - priceCents) * (item.quantity || 1);
+        totalDiscountCents += itemDiscountCents > 0 ? itemDiscountCents : 0;
+
         return {
           cart_item_id: item.cart_item_id,
           product: item.product,
           quantity: item.quantity,
           price: priceCents,
+          base_price: basePriceCents,
           engravings: item.engravings || [],
           colors: item.colors?.map((color: any) => color.id) || [],
           promotions: activePromotions.map((promo: any) => promo.id),
           is_additional_part: isAdditionalPart,
         };
-      }));
+      });
 
-      const subtotalCents = data.subtotal || orderItemsData.reduce(
-        (sum: number, item: OrderItemInput) => sum + item.price * item.quantity,
+      const subtotalCents = data.subtotal || orderItemsWithBasePrice.reduce(
+        (sum: number, item: any) => sum + item.price * item.quantity,
         0
       );
       const taxRate = process.env.TAX_RATE ? parseFloat(process.env.TAX_RATE) : 0.0825;
       const taxCents = data.sales_tax || Math.round(subtotalCents * taxRate);
       const transactionFeeCents = data.transaction_fee || 50;
-
-      // Calculate total discount based on order items
-      let totalDiscountCents = 0;
-      const orderItemsWithBasePrice = await Promise.all(orderItemsData.map(async (item) => {
-        // For additional parts, get base price from the part itself
-        if (item.is_additional_part) {
-          const cartItem = item.cart_item_id
-            ? cart.cart_items.find((ci: CartItem) => ci.id.toString() === item.cart_item_id)
-            : cart.cart_items.find((ci: CartItem) => ci.product.id === item.product && ci.is_additional_part);
-          
-          const basePriceCents = cartItem ? Math.round(parseFloat(cartItem.base_price) * 100) : item.price;
-          const itemDiscountCents = (basePriceCents - item.price) * item.quantity;
-          totalDiscountCents += itemDiscountCents > 0 ? itemDiscountCents : 0;
-          return { ...item, base_price: basePriceCents };
-        }
-        
-        // For full products, get base price from product.default_price
-        const product = await strapi.entityService.findOne('api::product.product', item.product, {
-          fields: ['default_price'],
-        });
-        const basePriceCents = Math.round(product.default_price * 100);
-        const itemDiscountCents = (basePriceCents - item.price) * item.quantity;
-        totalDiscountCents += itemDiscountCents > 0 ? itemDiscountCents : 0;
-        return { ...item, base_price: basePriceCents };
-      }));
 
       const discountsCents = totalDiscountCents;
       const calculatedTotalCents = subtotalCents + shippingCents + taxCents + transactionFeeCents;
@@ -248,15 +242,13 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
       });
 
       for (const item of orderItemsWithBasePrice) {
-        const product = await strapi.entityService.findOne('api::product.product', item.product, {
-          fields: ['default_price', 'effective_price', 'units_sold'],
-        });
-        
+        const product = productMap.get(item.product);
+
         // Find the matching cart item to get is_additional_part flag and cart_item_parts
         const cartItem = item.cart_item_id
           ? cart.cart_items.find((ci: CartItem) => ci.id.toString() === item.cart_item_id)
           : cart.cart_items.find((ci: CartItem) => ci.product.id === item.product);
-        
+
         const orderItem = await strapi.entityService.create('api::order-item.order-item', {
           data: {
             order: order.id,
