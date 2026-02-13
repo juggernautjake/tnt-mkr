@@ -74,6 +74,17 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
       throw new ValidationError('Either shippingMethodId or shipping_cost is required');
     }
 
+    // Validate guest email format if no user
+    if (!user && data.guest_email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(data.guest_email)) {
+        throw new ValidationError('Invalid email address format');
+      }
+    }
+    if (!user && !data.guest_email) {
+      throw new ValidationError('Guest email is required for non-authenticated orders');
+    }
+
     try {
       const cart = await strapi.entityService.findOne('api::cart.cart', data.cartId, {
         populate: {
@@ -95,6 +106,11 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
       }
       if (cart.cart_items.length === 0) {
         throw new ValidationError('No items to order');
+      }
+
+      // Prevent duplicate orders from the same cart
+      if (cart.status === 'converted') {
+        throw new ValidationError('This cart has already been converted to an order');
       }
 
       // Handle shipping cost - support both old (shippingMethodId) and new (EasyPost) methods
@@ -200,11 +216,20 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
           filters: { code: data.discount_code.code },
           limit: 1,
         });
-        if (discountCodes.length > 0) {
-          discountCodeId = Number(discountCodes[0].id);
-        } else {
+        if (discountCodes.length === 0) {
           throw new ValidationError('Invalid discount code');
         }
+        const discountCode = discountCodes[0] as any;
+        if (discountCode.active === false) {
+          throw new ValidationError('This discount code is no longer active');
+        }
+        if (!discountCode.publishedAt) {
+          throw new ValidationError('This discount code is no longer active');
+        }
+        if (discountCode.valid_until && new Date(discountCode.valid_until) < new Date()) {
+          throw new ValidationError('This discount code has expired');
+        }
+        discountCodeId = Number(discountCode.id);
       }
 
       const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;

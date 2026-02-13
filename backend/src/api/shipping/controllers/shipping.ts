@@ -38,6 +38,27 @@ async function isAdmin(ctx: Context): Promise<boolean> {
 // Valid unified order status values
 type OrderStatus = 'pending' | 'paid' | 'printing' | 'printed' | 'assembling' | 'packaged' | 'shipped' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'canceled' | 'returned';
 
+// State machine: defines which transitions are allowed for each status
+const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  pending: ['paid', 'canceled'],
+  paid: ['printing', 'packaged', 'shipped', 'canceled'],
+  printing: ['printed', 'canceled'],
+  printed: ['assembling', 'canceled'],
+  assembling: ['packaged', 'canceled'],
+  packaged: ['shipped', 'canceled'],
+  shipped: ['in_transit', 'out_for_delivery', 'delivered', 'canceled', 'returned'],
+  in_transit: ['out_for_delivery', 'delivered', 'returned'],
+  out_for_delivery: ['delivered', 'returned'],
+  delivered: ['returned'],
+  canceled: [],
+  returned: [],
+};
+
+function isValidTransition(from: OrderStatus, to: OrderStatus): boolean {
+  const allowed = VALID_TRANSITIONS[from];
+  return allowed ? allowed.includes(to) : false;
+}
+
 // Helper function to map EasyPost status to order status
 function mapTrackingStatusToOrderStatus(trackingStatus: string): OrderStatus {
   const statusMap: Record<string, OrderStatus> = {
@@ -176,7 +197,8 @@ export default {
       return ctx.forbidden('Admin access required');
     }
 
-    const { status, search, page = 1, pageSize = 50 } = ctx.query;
+    const { status, search, page = 1, pageSize: rawPageSize = 50 } = ctx.query;
+    const pageSize = Math.min(Math.max(Number(rawPageSize) || 50, 1), 200);
 
     try {
       const filters: any = {};
@@ -319,7 +341,16 @@ export default {
         return ctx.notFound('Order not found');
       }
 
-      const previousStatus = order.order_status;
+      const previousStatus = order.order_status as OrderStatus;
+
+      // Enforce state machine — prevent invalid transitions
+      if (previousStatus && !isValidTransition(previousStatus, order_status as OrderStatus)) {
+        return ctx.badRequest(
+          `Invalid status transition: "${previousStatus}" → "${order_status}". ` +
+          `Allowed transitions from "${previousStatus}": ${(VALID_TRANSITIONS[previousStatus] || []).join(', ') || 'none (terminal state)'}`
+        );
+      }
+
       const updateData: any = {
         order_status: order_status,
       };
