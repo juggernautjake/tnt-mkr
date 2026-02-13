@@ -10,7 +10,7 @@ export default (): RedisClientType => {
     socket: {
       ...(useTls && {
         tls: true,
-        rejectUnauthorized: process.env.REDIS_TLS_REJECT_UNAUTHORIZED !== 'false',
+        rejectUnauthorized: process.env.REDIS_TLS_REJECT_UNAUTHORIZED === 'true',
       }),
       keepAlive: 5000,
       reconnectStrategy: (retries) => {
