@@ -4,76 +4,14 @@ import shippingCalculator from '../../../services/shipping-calculator';
 import googleSheets from '../../../services/google-sheets';
 import orderEmailTemplates from '../../../services/order-email-templates';
 import { ORDER_POPULATE_FULL } from '../../../services/order-populate';
-
-// Allowed admin role names/types (exact match, lowercase)
-const ADMIN_ROLES = new Set(['admin', 'administrator']);
-
-async function isAdmin(ctx: Context): Promise<boolean> {
-  const { user } = ctx.state;
-
-  if (!user) {
-    return false;
-  }
-
-  try {
-    const userWithRole = await strapi.entityService.findOne('plugin::users-permissions.user', user.id, {
-      populate: ['role'],
-    });
-
-    if (!userWithRole?.role) {
-      return false;
-    }
-
-    const role = userWithRole.role as any;
-    const roleName = (role.name || '').toLowerCase();
-    const roleType = (role.type || '').toLowerCase();
-
-    return ADMIN_ROLES.has(roleName) || ADMIN_ROLES.has(roleType);
-  } catch (error) {
-    strapi.log.error('Error checking admin role:', error);
-    return false;
-  }
-}
-
-// Valid unified order status values
-type OrderStatus = 'pending' | 'paid' | 'printing' | 'printed' | 'assembling' | 'packaged' | 'shipped' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'canceled' | 'returned';
-
-// State machine: defines which transitions are allowed for each status
-const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  pending: ['paid', 'canceled'],
-  paid: ['printing', 'packaged', 'shipped', 'canceled'],
-  printing: ['printed', 'canceled'],
-  printed: ['assembling', 'canceled'],
-  assembling: ['packaged', 'canceled'],
-  packaged: ['shipped', 'canceled'],
-  shipped: ['in_transit', 'out_for_delivery', 'delivered', 'canceled', 'returned'],
-  in_transit: ['out_for_delivery', 'delivered', 'returned'],
-  out_for_delivery: ['delivered', 'returned'],
-  delivered: ['returned'],
-  canceled: [],
-  returned: [],
-};
-
-function isValidTransition(from: OrderStatus, to: OrderStatus): boolean {
-  const allowed = VALID_TRANSITIONS[from];
-  return allowed ? allowed.includes(to) : false;
-}
-
-// Helper function to map EasyPost status to order status
-function mapTrackingStatusToOrderStatus(trackingStatus: string): OrderStatus {
-  const statusMap: Record<string, OrderStatus> = {
-    'pre_transit': 'shipped',
-    'in_transit': 'in_transit',
-    'out_for_delivery': 'out_for_delivery',
-    'delivered': 'delivered',
-    'return_to_sender': 'returned',
-    'failure': 'returned',
-    'cancelled': 'canceled',
-    'error': 'shipped',
-    'unknown': 'shipped',
-  };
-  return statusMap[trackingStatus] || 'shipped';
-}
+import { isAdmin } from '../../../services/admin-auth';
+import {
+  type OrderStatus,
+  ALL_ORDER_STATUSES,
+  VALID_TRANSITIONS,
+  isValidTransition,
+  mapTrackingStatusToOrderStatus,
+} from '../../../services/order-status';
 
 export default {
   // Validate an address
@@ -327,9 +265,8 @@ export default {
       send_email?: boolean;
     };
 
-    const validStatuses: OrderStatus[] = ['pending', 'paid', 'printing', 'printed', 'assembling', 'packaged', 'shipped', 'in_transit', 'out_for_delivery', 'delivered', 'canceled', 'returned'];
-    if (!order_status || !validStatuses.includes(order_status as OrderStatus)) {
-      return ctx.badRequest(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
+    if (!order_status || !ALL_ORDER_STATUSES.includes(order_status as OrderStatus)) {
+      return ctx.badRequest(`Invalid status. Must be one of: ${ALL_ORDER_STATUSES.join(', ')}`);
     }
 
     try {
