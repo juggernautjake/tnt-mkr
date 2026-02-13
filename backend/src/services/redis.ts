@@ -2,35 +2,40 @@
 import { createClient, RedisClientType } from 'redis';
 
 export default (): RedisClientType => {
+  const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+  const useTls = redisUrl.startsWith('rediss://') || process.env.REDIS_TLS === 'true';
+
   const client = createClient({
-    url: process.env.REDIS_URL || 'redis://localhost:6379',
+    url: redisUrl,
     socket: {
-      tls: true, // Enable TLS for secure connection
-      rejectUnauthorized: false, // Allow self-signed certificates
-      keepAlive: 5000, // Increased to 5 seconds for stability
+      ...(useTls && {
+        tls: true,
+        rejectUnauthorized: process.env.REDIS_TLS_REJECT_UNAUTHORIZED !== 'false',
+      }),
+      keepAlive: 5000,
       reconnectStrategy: (retries) => {
         if (retries > 20) {
-          console.error('Too many reconnection attempts. Giving up.');
+          strapi.log.error('Redis: too many reconnection attempts, giving up');
           return new Error('Too many reconnection attempts');
         }
-        return Math.min(retries * 100, 3000); // Exponential backoff, max 3 seconds
+        return Math.min(retries * 100, 3000);
       },
     },
   }) as RedisClientType;
 
   client.on('connect', () => {
-    console.log('Redis connected successfully');
+    strapi.log.info('Redis connected successfully');
   });
 
   client.on('error', (err: Error) => {
-    console.error('Redis Client Error:', err);
+    strapi.log.error('Redis client error:', err.message);
   });
 
   (async () => {
     try {
       await client.connect();
     } catch (err) {
-      console.error('Failed to connect to Redis:', err);
+      strapi.log.error('Failed to connect to Redis:', (err as Error).message);
     }
   })();
 

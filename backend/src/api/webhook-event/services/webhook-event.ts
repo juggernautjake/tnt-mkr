@@ -276,7 +276,7 @@ export default factories.createCoreService('api::webhook-event.webhook-event', (
         const failureReason = event_data.last_payment_error?.message || 'Unknown reason';
         await strapi.plugins['email'].services.email.send({
           to: customerEmail,
-          from: 'TNT MKR <no-reply@tnt-mkr.com>',
+          from: process.env.DEFAULT_FROM_EMAIL || 'TNT MKR <no-reply@tnt-mkr.com>',
           subject: 'Payment Failed - TNT-MKR',
           text: `Your payment for order ${order.order_number} failed due to: ${failureReason}. Please try again with a different payment method.`,
         });
@@ -366,7 +366,7 @@ export default factories.createCoreService('api::webhook-event.webhook-event', (
     try {
       await strapi.plugins['email'].services.email.send({
         to: customerEmail,
-        from: 'TNT MKR <no-reply@tnt-mkr.com>',
+        from: process.env.DEFAULT_FROM_EMAIL || 'TNT MKR <no-reply@tnt-mkr.com>',
         subject: 'Order Confirmation - TNT-MKR',
         html,
       });
@@ -378,7 +378,7 @@ export default factories.createCoreService('api::webhook-event.webhook-event', (
 
   // New method: Send notification to company email
   async sendAdminNotification(order: Order) {
-    const companyEmail = 'customer-service@tnt-mkr.com'; // Or your Google group email if different
+    const companyEmail = process.env.DEFAULT_REPLY_TO_EMAIL || 'customer-service@tnt-mkr.com';
 
     const orderData = this.transformOrderData(order);
     const compiledTemplate = Handlebars.compile(ORDER_CONFIRMATION_TEMPLATE);
@@ -387,7 +387,7 @@ export default factories.createCoreService('api::webhook-event.webhook-event', (
     try {
       await strapi.plugins['email'].services.email.send({
         to: companyEmail,
-        from: 'TNT MKR <no-reply@tnt-mkr.com>',
+        from: process.env.DEFAULT_FROM_EMAIL || 'TNT MKR <no-reply@tnt-mkr.com>',
         subject: `New Order Received - #${order.order_number}`,
         html,
       });
