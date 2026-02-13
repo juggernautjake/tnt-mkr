@@ -974,6 +974,7 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     draftAndPublish: false;
   };
   attributes: {
+    admin_hidden: Attribute.Boolean & Attribute.DefaultTo<false>;
     admin_notes: Attribute.Text;
     billing_address: Attribute.Relation<
       'api::order.order',
@@ -1015,7 +1016,10 @@ export interface ApiOrderOrder extends Schema.CollectionType {
       [
         'pending',
         'paid',
-        'processing',
+        'printing',
+        'printed',
+        'assembling',
+        'packaged',
         'shipped',
         'in_transit',
         'out_for_delivery',
