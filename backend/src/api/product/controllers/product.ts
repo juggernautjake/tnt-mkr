@@ -90,7 +90,7 @@ export default factories.createCoreController('api::product.product', ({ strapi 
 
       return this.sanitizeOutput(enhancedEntities, ctx);
     } catch (error) {
-      console.error('Error in product find method:', error);
+      strapi.log.error('Error in product find method:', error);
       ctx.status = 500;
       return { error: { status: 500, name: 'InternalServerError', message: 'Failed to fetch products', details: error.message } };
     }
@@ -139,7 +139,7 @@ export default factories.createCoreController('api::product.product', ({ strapi 
 
       return this.sanitizeOutput(enhancedEntity, ctx);
     } catch (error) {
-      console.error('Error in product findOne method:', error);
+      strapi.log.error('Error in product findOne method:', error);
       ctx.status = 500;
       return { error: { status: 500, name: 'InternalServerError', message: 'Failed to fetch product', details: error.message } };
     }

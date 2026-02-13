@@ -1,7 +1,7 @@
 // src/api/product/content-types/product/lifecycles.ts
 export default {
   async beforeCreate(event: any) {
-    console.log('Creating product:', event.params.data);
+    strapi.log.debug('Creating product');
     const data = event.params.data;
     if (data.default_price !== undefined && data.default_price !== null) {
       data.default_price = Number(data.default_price);

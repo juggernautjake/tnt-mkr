@@ -122,7 +122,7 @@ const easypostService = {
         error: messages.length > 0 ? messages.join(', ') : 'Address could not be verified. Please check and try again.',
       };
     } catch (error: any) {
-      console.error('EasyPost address validation error:', error);
+      strapi.log.error('EasyPost address validation error:', error);
       
       // Handle specific EasyPost errors
       if (error.message?.includes('ADDRESS.VERIFY.FAILURE')) {
@@ -192,7 +192,7 @@ const easypostService = {
         })) || [],
       };
     } catch (error: any) {
-      console.error('EasyPost create shipment error:', error);
+      strapi.log.error('EasyPost create shipment error:', error);
       throw new Error(error.message || 'Failed to create shipment');
     }
   },
@@ -210,11 +210,7 @@ const easypostService = {
         carrier: carrier,
       });
 
-      console.log(`[EasyPost] Created tracker for ${trackingNumber}:`, {
-        id: tracker.id,
-        status: tracker.status,
-        est_delivery_date: tracker.est_delivery_date,
-      });
+      strapi.log.info(`EasyPost tracker created for ${trackingNumber}, status: ${tracker.status}`);
 
       return {
         id: tracker.id,
@@ -236,7 +232,7 @@ const easypostService = {
         })) || [],
       };
     } catch (error: any) {
-      console.error('EasyPost create tracker error:', error);
+      strapi.log.error('EasyPost create tracker error:', error);
       // Return a minimal tracker result so the order can still be marked as shipped
       return {
         id: '',
@@ -260,11 +256,7 @@ const easypostService = {
         carrier: carrier,
       });
 
-      console.log(`[EasyPost] Fetched tracking status for ${trackingNumber}:`, {
-        id: tracker.id,
-        status: tracker.status,
-        status_detail: tracker.status_detail,
-      });
+      strapi.log.info(`EasyPost tracking status for ${trackingNumber}: ${tracker.status}`);
 
       return {
         id: tracker.id,
@@ -286,7 +278,7 @@ const easypostService = {
         })) || [],
       };
     } catch (error: any) {
-      console.error('EasyPost get tracking status error:', error);
+      strapi.log.error('EasyPost get tracking status error:', error);
       return null;
     }
   },
@@ -314,7 +306,7 @@ const easypostService = {
         })) || [],
       };
     } catch (error: any) {
-      console.error('EasyPost retrieve tracker error:', error);
+      strapi.log.error('EasyPost retrieve tracker error:', error);
       return null;
     }
   },
@@ -356,7 +348,7 @@ const easypostService = {
           shipmentIds.push(shipment.id);
         }
       } catch (error: any) {
-        console.error('Error getting rates for parcel:', error);
+        strapi.log.error('Error getting rates for parcel:', error);
       }
     }
 
