@@ -160,7 +160,7 @@ export default factories.createCoreController('api::contact.contact', ({ strapi 
       await strapi.plugins['email'].services.email.send({
         to: contact.email,
         from: process.env.DEFAULT_FROM_EMAIL || 'TNT MKR <no-reply@tnt-mkr.com>',
-        subject: 'We've Received Your Request',
+        subject: "We've Received Your Request",
         html: customerHtml,
       });
 
