@@ -3,6 +3,7 @@ import easypostService from '../../../services/easypost';
 import shippingCalculator from '../../../services/shipping-calculator';
 import googleSheets from '../../../services/google-sheets';
 import orderEmailTemplates from '../../../services/order-email-templates';
+import { ORDER_POPULATE_FULL } from '../../../services/order-populate';
 
 // Allowed admin role names/types (exact match, lowercase)
 const ADMIN_ROLES = new Set(['admin', 'administrator']);
@@ -267,18 +268,7 @@ export default {
 
       const updatedOrder = await strapi.entityService.update('api::order.order', id, {
         data: updateData,
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          shipping_box: true,
-          user: true,
-        },
+        populate: { ...ORDER_POPULATE_FULL, shipping_box: true },
       });
 
       if (!updateFields.admin_hidden) {
@@ -322,17 +312,7 @@ export default {
 
     try {
       const order = await strapi.entityService.findOne('api::order.order', id, {
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       }) as any;
 
       if (!order) {
@@ -385,17 +365,7 @@ export default {
 
       const updatedOrder = await strapi.entityService.update('api::order.order', id, {
         data: updateData,
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       });
 
       let emailResult: { success: boolean; reason?: string; sentTo?: string; bcc?: string; error?: string } = { success: false, reason: 'not_requested' };
@@ -453,17 +423,7 @@ export default {
 
     try {
       const order = await strapi.entityService.findOne('api::order.order', id, {
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       });
 
       if (!order) {
@@ -513,17 +473,7 @@ export default {
 
       const updatedOrder = await strapi.entityService.update('api::order.order', id, {
         data: updateData,
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       });
 
       // Send shipping notification email
@@ -572,17 +522,7 @@ export default {
 
     try {
       const order = await strapi.entityService.findOne('api::order.order', id, {
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       }) as any;
 
       if (!order) {
@@ -622,17 +562,7 @@ export default {
 
       const updatedOrder = await strapi.entityService.update('api::order.order', id, {
         data: updateData,
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       });
 
       try {
@@ -701,17 +631,7 @@ export default {
 
               const updatedOrder = await strapi.entityService.update('api::order.order', order.id, {
                 data: updateData,
-                populate: {
-                  shipping_address: true,
-                  billing_address: true,
-                  order_items: {
-                    populate: {
-                      product: true,
-                      order_item_parts: { populate: ['product_part', 'color'] },
-                    },
-                  },
-                  user: true,
-                },
+                populate: ORDER_POPULATE_FULL,
               });
 
               try {
@@ -853,17 +773,7 @@ export default {
 
         const updatedOrder = await strapi.entityService.update('api::order.order', orderId, {
           data: updateData,
-          populate: {
-            shipping_address: true,
-            billing_address: true,
-            order_items: {
-              populate: {
-                product: true,
-                order_item_parts: { populate: ['product_part', 'color'] },
-              },
-            },
-            user: true,
-          },
+          populate: ORDER_POPULATE_FULL,
         });
 
         try {
@@ -976,19 +886,7 @@ export default {
         filters: {
           ordered_at: { $gte: ninetyDaysAgo.toISOString() },
         },
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          shipping_box: true,
-          user: true,
-          discount_code: true,
-        },
+        populate: { ...ORDER_POPULATE_FULL, shipping_box: true, discount_code: true },
         sort: { ordered_at: 'desc' },
         limit: 500,
       }) as any[];
@@ -1047,17 +945,7 @@ export default {
     try {
       const orders = await strapi.entityService.findMany('api::order.order', {
         filters: { tracking_number: trackingNumber },
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       });
 
       if (orders.length === 0) {
@@ -1088,17 +976,7 @@ export default {
 
       const updatedOrder = await strapi.entityService.update('api::order.order', order.id, {
         data: updateData,
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       });
 
       strapi.log.info(`[TRACKING WEBHOOK] Updated order ${order.order_number}: ${previousStatus} → ${newOrderStatus}`);
@@ -1288,17 +1166,7 @@ export default {
 
     try {
       const order = await strapi.entityService.findOne('api::order.order', id, {
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       }) as any;
 
       if (!order) {

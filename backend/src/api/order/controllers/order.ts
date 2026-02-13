@@ -1,18 +1,10 @@
 import { factories } from '@strapi/strapi';
 import { errors } from '@strapi/utils';
 import { Context } from 'koa';
-import Stripe from 'stripe';
+import stripe from '../../../services/stripe';
+import { filterActivePromotions } from '../../../services/pricing';
 
 const { ApplicationError, ValidationError, NotFoundError } = errors;
-
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-if (!stripeSecretKey) {
-  throw new Error('STRIPE_SECRET_KEY is not set in the environment variables');
-}
-
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2025-05-28.basil',
-});
 
 type CartStatus = 'active' | 'abandoned' | 'converted';
 
@@ -140,9 +132,7 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
         
         // For additional parts, don't apply product-level promotions
         const isAdditionalPart = cartItem?.is_additional_part || false;
-        const activePromotions = isAdditionalPart ? [] : product.promotions.filter(
-          (promo: any) => promo.start_date <= currentDate && promo.end_date >= currentDate && promo.publishedAt
-        );
+        const activePromotions = isAdditionalPart ? [] : filterActivePromotions(product.promotions, currentDate);
         
         const priceCents = item.price || Math.round(product.effective_price * 100);
         return {
