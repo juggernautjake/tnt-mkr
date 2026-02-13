@@ -1,4 +1,4 @@
-export default [
+export default ({ env }) => [
   'strapi::errors',
   {
     name: 'strapi::body',
@@ -9,11 +9,11 @@ export default [
   {
     name: 'strapi::session',
     config:
-      process.env.NODE_ENV === 'production'
+      env('NODE_ENV') === 'production'
         ? {
             provider: 'redis',
             providerOptions: {
-              url: process.env.REDIS_URL,
+              url: env('REDIS_URL'),
               socket: {
                 reconnectStrategy: (retries) => {
                   if (retries > 10) {
@@ -31,15 +31,15 @@ export default [
   {
     name: 'strapi::logger',
     config: {
-      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+      level: env('NODE_ENV') === 'production' ? 'info' : 'debug',
     },
   },
   {
     name: 'strapi::cors',
     config: {
       enabled: true,
-      origin: process.env.CORS_ORIGINS
-        ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
+      origin: env('CORS_ORIGINS')
+        ? env('CORS_ORIGINS').split(',').map((o) => o.trim())
         : ['http://localhost:3000'],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       headers: ['Content-Type', 'Authorization', 'X-Guest-Session', 'Stripe-Signature'],
@@ -57,7 +57,7 @@ export default [
   {
     name: 'global::rateLimit',
     config: {
-      maxRequests: 500,
+      maxRequests: 100,
       windowSeconds: 60,
     },
   },
