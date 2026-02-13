@@ -38,7 +38,9 @@ export default [
     name: 'strapi::cors',
     config: {
       enabled: true,
-      origin: '*',
+      origin: process.env.CORS_ORIGINS
+        ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
+        : ['http://localhost:3000'],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       headers: ['Content-Type', 'Authorization', 'X-Guest-Session', 'Stripe-Signature'],
       credentials: true,

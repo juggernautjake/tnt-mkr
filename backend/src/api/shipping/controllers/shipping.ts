@@ -4,55 +4,32 @@ import shippingCalculator from '../../../services/shipping-calculator';
 import googleSheets from '../../../services/google-sheets';
 import orderEmailTemplates from '../../../services/order-email-templates';
 
-// Helper function to check if user is admin
+// Allowed admin role names/types (exact match, lowercase)
+const ADMIN_ROLES = new Set(['admin', 'administrator']);
+
 async function isAdmin(ctx: Context): Promise<boolean> {
   const { user } = ctx.state;
-  
-  // Debug: Log the user state
-  strapi.log.info(`[ADMIN CHECK] User state exists: ${!!user}`);
-  
+
   if (!user) {
-    strapi.log.warn('[ADMIN CHECK] No user in context state - authentication may have failed');
     return false;
   }
-  
-  strapi.log.info(`[ADMIN CHECK] User ID: ${user.id}, checking role...`);
-  
+
   try {
     const userWithRole = await strapi.entityService.findOne('plugin::users-permissions.user', user.id, {
       populate: ['role'],
     });
-    
-    if (!userWithRole) {
-      strapi.log.warn(`[ADMIN CHECK] User ${user.id} not found in database`);
+
+    if (!userWithRole?.role) {
       return false;
     }
-    
-    if (!userWithRole.role) {
-      strapi.log.warn(`[ADMIN CHECK] User ${user.id} has no role assigned`);
-      return false;
-    }
-    
+
     const role = userWithRole.role as any;
-    const roleName = role.name?.toLowerCase() || '';
-    const roleType = role.type?.toLowerCase() || '';
-    
-    strapi.log.info(`[ADMIN CHECK] User ${user.id} - Role name: "${role.name}", Role type: "${role.type}"`);
-    
-    // Check for various admin role patterns
-    const isAdminRole = 
-      roleName === 'admin' || 
-      roleName === 'administrator' ||
-      roleName.includes('admin') ||
-      roleType === 'admin' ||
-      roleType === 'administrator' ||
-      roleType.includes('admin');
-    
-    strapi.log.info(`[ADMIN CHECK] User ${user.id} - Is admin: ${isAdminRole}`);
-    
-    return isAdminRole;
+    const roleName = (role.name || '').toLowerCase();
+    const roleType = (role.type || '').toLowerCase();
+
+    return ADMIN_ROLES.has(roleName) || ADMIN_ROLES.has(roleType);
   } catch (error) {
-    strapi.log.error('[ADMIN CHECK] Error checking admin role:', error);
+    strapi.log.error('Error checking admin role:', error);
     return false;
   }
 }
@@ -1265,7 +1242,7 @@ export default {
                 <li>From: ${process.env.DEFAULT_FROM_EMAIL || 'no-reply@tnt-mkr.com'}</li>
                 <li>Reply-To: ${customerServiceEmail}</li>
                 <li>BCC: ${customerServiceEmail}</li>
-                <li>Mailgun Domain: ${process.env.MAILGUN_DOMAIN || 'not set'}</li>
+                <li>Mailgun Domain: ${process.env.MAILGUN_DOMAIN ? 'configured' : 'not set'}</li>
               </ul>
             </div>
             <p style="color: #999; font-size: 12px; text-align: center;">
@@ -1358,42 +1335,4 @@ export default {
     }
   },
 
-  // Debug endpoint to check auth status (temporary - remove in production)
-  async debugAuth(ctx: Context) {
-    const { user } = ctx.state;
-    
-    if (!user) {
-      return ctx.send({
-        authenticated: false,
-        message: 'No user in context - JWT may be invalid or missing',
-        headers: {
-          authorization: ctx.request.header.authorization ? 'Present (redacted)' : 'Missing',
-        },
-      });
-    }
-
-    try {
-      const userWithRole = await strapi.entityService.findOne('plugin::users-permissions.user', user.id, {
-        populate: ['role'],
-      });
-
-      return ctx.send({
-        authenticated: true,
-        user_id: user.id,
-        user_email: (userWithRole as any)?.email,
-        role: userWithRole?.role ? {
-          id: (userWithRole.role as any).id,
-          name: (userWithRole.role as any).name,
-          type: (userWithRole.role as any).type,
-        } : null,
-        is_admin: await isAdmin(ctx),
-      });
-    } catch (error: any) {
-      return ctx.send({
-        authenticated: true,
-        user_id: user.id,
-        error: error.message,
-      });
-    }
-  },
 };

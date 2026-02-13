@@ -10,7 +10,7 @@ export default {
     if (process.env.REDIS_URL) {
       try {
         strapi.redis = redisService() as RedisClientType;
-        strapi.log.info(`Redis initialized with REDIS_URL: ${process.env.REDIS_URL}`);
+        strapi.log.info('Redis client initialized');
       } catch (error) {
         strapi.log.error('Failed to initialize Redis:', error);
       }

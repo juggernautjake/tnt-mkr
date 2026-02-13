@@ -7,7 +7,9 @@ export default ({ env }) => {
     postgres: {
       connection: {
         connectionString: env('DATABASE_URL'),
-        ssl: env('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
+        ssl: env('NODE_ENV') === 'production'
+          ? { rejectUnauthorized: env.bool('DATABASE_SSL_REJECT_UNAUTHORIZED', true) }
+          : false,
         schema: env('DATABASE_SCHEMA', 'public'),
       },
       pool: {
