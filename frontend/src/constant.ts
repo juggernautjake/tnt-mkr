@@ -7,6 +7,3 @@
  */
 
 export const API = process.env.NEXT_PUBLIC_API_URL;
-
-export const AUTH_TOKEN = "authToken";
-export const BEARER = "Bearer";

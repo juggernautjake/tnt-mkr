@@ -76,7 +76,7 @@ export const initGoogleSheets = async (): Promise<boolean> => {
     spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID || '';
 
     if (!clientEmail || !privateKey || !spreadsheetId) {
-      console.log('Google Sheets not configured - missing credentials');
+      strapi.log.info('Google Sheets not configured - missing credentials');
       return false;
     }
 
@@ -89,10 +89,10 @@ export const initGoogleSheets = async (): Promise<boolean> => {
     });
 
     sheetsClient = google.sheets({ version: 'v4', auth });
-    console.log('Google Sheets initialized successfully');
+    strapi.log.info('Google Sheets initialized successfully');
     return true;
   } catch (error) {
-    console.error('Failed to initialize Google Sheets:', error);
+    strapi.log.error('Failed to initialize Google Sheets:', error);
     return false;
   }
 };
@@ -175,7 +175,7 @@ export const ensureOrdersSheet = async (): Promise<boolean> => {
         });
       }
 
-      console.log('Created Orders sheet with headers');
+      strapi.log.info('Created Orders sheet with headers');
     }
 
     // Check for Pirate Ship Export sheet
@@ -224,12 +224,12 @@ export const ensureOrdersSheet = async (): Promise<boolean> => {
         },
       });
 
-      console.log('Created Pirate Ship Export sheet');
+      strapi.log.info('Created Pirate Ship Export sheet');
     }
 
     return true;
   } catch (error) {
-    console.error('Error ensuring Orders sheet:', error);
+    strapi.log.error('Error ensuring Orders sheet:', error);
     return false;
   }
 };
@@ -401,7 +401,7 @@ export const upsertOrder = async (order: OrderData): Promise<number | null> => {
 
     return rowNumber;
   } catch (error) {
-    console.error('Error upserting order to Google Sheets:', error);
+    strapi.log.error('Error upserting order to Google Sheets:', error);
     return null;
   }
 };
@@ -440,7 +440,7 @@ export const updateRowColor = async (rowNumber: number, status: string): Promise
       },
     });
   } catch (error) {
-    console.error('Error updating row color:', error);
+    strapi.log.error('Error updating row color:', error);
   }
 };
 
@@ -486,7 +486,7 @@ export const addToPirateShipExport = async (orders: OrderData[]): Promise<boolea
 
     return true;
   } catch (error) {
-    console.error('Error adding to Pirate Ship export:', error);
+    strapi.log.error('Error adding to Pirate Ship export:', error);
     return false;
   }
 };

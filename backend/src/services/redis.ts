@@ -10,9 +10,10 @@ export default (): RedisClientType => {
     socket: {
       ...(useTls && {
         tls: true,
-        rejectUnauthorized: process.env.REDIS_TLS_REJECT_UNAUTHORIZED !== 'false',
+        rejectUnauthorized: process.env.REDIS_TLS_REJECT_UNAUTHORIZED === 'true',
       }),
       keepAlive: 5000,
+      pingInterval: 30000,
       reconnectStrategy: (retries) => {
         if (retries > 20) {
           strapi.log.error('Redis: too many reconnection attempts, giving up');
@@ -23,12 +24,23 @@ export default (): RedisClientType => {
     },
   }) as RedisClientType;
 
+  let hasConnected = false;
+
   client.on('connect', () => {
-    strapi.log.info('Redis connected successfully');
+    if (!hasConnected) {
+      strapi.log.info('Redis connected successfully');
+      hasConnected = true;
+    } else {
+      strapi.log.debug('Redis reconnected');
+    }
   });
 
   client.on('error', (err: Error) => {
-    strapi.log.error('Redis client error:', err.message);
+    if (err.message.includes('Socket closed unexpectedly')) {
+      strapi.log.debug('Redis socket closed, reconnecting...');
+    } else {
+      strapi.log.error('Redis client error:', err.message);
+    }
   });
 
   (async () => {

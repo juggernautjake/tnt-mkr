@@ -408,7 +408,7 @@ async function getShippingRates(
       }
     }
   } catch (error) {
-    console.error('EasyPost rate fetch failed, using fallback:', error);
+    strapi.log.error('EasyPost rate fetch failed, using fallback:', error);
   }
 
   // Fallback to calculated rates

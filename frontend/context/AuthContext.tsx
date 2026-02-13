@@ -1,9 +1,6 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getToken, setToken, removeToken } from "../src/helpers";
-import { API, BEARER } from "../src/constant";
-import axios from "axios";
 
 interface User {
   id: number;
@@ -26,9 +23,6 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setTokenState] = useState<string | null>(null);
   const [guestSessionId, setGuestSessionIdState] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -43,18 +37,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsInitialized(true);
     }
   }, []);
-
-  const login = (token: string, user: User, rememberMe = false) => {
-    // Placeholder for future authentication
-  };
-
-  const logout = () => {
-    // Placeholder for future authentication
-  };
-
-  const updateUser = (updatedUser: User) => {
-    // Placeholder for future authentication
-  };
 
   const setGuestSessionId = (sessionId: string) => {
     setGuestSessionIdState(sessionId);

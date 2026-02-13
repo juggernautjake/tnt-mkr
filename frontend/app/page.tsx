@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef, useMemo, useLayoutEffect, Suspense, lazy } from "react";
 import axios from "axios";
-import { motion } from "framer-motion";
+
 import ProductCard from "../components/ProductCard";
 import CustomerReviewsCarousel from "../components/CustomerReviewsCarousel";
 import LoadingIndicator from "../components/LoadingIndicator";
@@ -660,15 +660,15 @@ export default function Home(): JSX.Element {
                 </button>
                 <div style={{ position: "relative", width: "100%", height: "100%" }}>
                   {extendedProducts.map((product, index) => (
-                    <motion.div
+                    <div
                       key={`${product.id}-${index}`}
-                      style={getProductStyle(index)}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: getProductStyle(index).opacity }}
-                      transition={{ duration: 1 }}
+                      style={{
+                        ...getProductStyle(index),
+                        transition: 'opacity 1s ease, transform 1s ease',
+                      }}
                     >
                       <ProductCard product={product} />
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
                 <button className="promo-arrow right" onClick={handleNextProduct} aria-label="Next product">
