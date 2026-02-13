@@ -159,8 +159,8 @@ export default factories.createCoreController('api::contact.contact', ({ strapi 
 
       await strapi.plugins['email'].services.email.send({
         to: contact.email,
-        from: 'TNT MKR <no-reply@tnt-mkr.com>',
-        subject: 'We’ve Received Your Request',
+        from: process.env.DEFAULT_FROM_EMAIL || 'TNT MKR <no-reply@tnt-mkr.com>',
+        subject: "We've Received Your Request",
         html: customerHtml,
       });
 
@@ -173,14 +173,15 @@ export default factories.createCoreController('api::contact.contact', ({ strapi 
         message: contact.message,
       });
 
+      const companyEmail = process.env.DEFAULT_REPLY_TO_EMAIL || 'customer-service@tnt-mkr.com';
       await strapi.plugins['email'].services.email.send({
-        to: 'customer-service@tnt-mkr.com',
-        from: 'TNT MKR <no-reply@tnt-mkr.com>',
+        to: companyEmail,
+        from: process.env.DEFAULT_FROM_EMAIL || 'TNT MKR <no-reply@tnt-mkr.com>',
         subject: 'New Customer Inquiry',
         html: companyHtml,
       });
 
-      strapi.log.info(`Emails sent to ${contact.email} and customer-service@tnt-mkr.com`);
+      strapi.log.info(`Emails sent to ${contact.email} and ${companyEmail}`);
       return ctx.created({ message: 'Contact request submitted successfully', data: contact });
     } catch (error) {
       strapi.log.error('Error in contact create:', error);

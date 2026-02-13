@@ -62,6 +62,12 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
     strapi.log.info(`[Cart Item Create] Received request with data: ${JSON.stringify(data)}`);
     strapi.log.debug(`[Cart Item Create] User: ${user ? user.id : 'None'}, Session ID: ${sessionId}`);
 
+    // Validate quantity
+    const quantity = data.quantity || 1;
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+      return ctx.badRequest('Quantity must be a whole number between 1 and 99');
+    }
+
     // Validate required fields based on whether it's an additional part or full product
     const isAdditionalPart = data.is_additional_part === true;
 
@@ -147,8 +153,12 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
 
     try {
       if (matchingItem) {
+        const newQuantity = (matchingItem.quantity || 0) + quantity;
+        if (newQuantity > 99) {
+          return ctx.badRequest('Cannot exceed 99 of the same item in cart');
+        }
         const updatedItem = await strapi.entityService.update('api::cart-item.cart-item', matchingItem.id, {
-          data: { quantity: (matchingItem.quantity || 0) + (data.quantity || 1) },
+          data: { quantity: newQuantity },
           populate: ['product', 'cart_item_parts.product_part', 'cart_item_parts.color'],
         });
         strapi.log.info(`[Cart Item Create] Updated item: ${JSON.stringify(updatedItem)}`);

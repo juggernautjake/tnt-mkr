@@ -3,55 +3,15 @@ import easypostService from '../../../services/easypost';
 import shippingCalculator from '../../../services/shipping-calculator';
 import googleSheets from '../../../services/google-sheets';
 import orderEmailTemplates from '../../../services/order-email-templates';
-
-// Allowed admin role names/types (exact match, lowercase)
-const ADMIN_ROLES = new Set(['admin', 'administrator']);
-
-async function isAdmin(ctx: Context): Promise<boolean> {
-  const { user } = ctx.state;
-
-  if (!user) {
-    return false;
-  }
-
-  try {
-    const userWithRole = await strapi.entityService.findOne('plugin::users-permissions.user', user.id, {
-      populate: ['role'],
-    });
-
-    if (!userWithRole?.role) {
-      return false;
-    }
-
-    const role = userWithRole.role as any;
-    const roleName = (role.name || '').toLowerCase();
-    const roleType = (role.type || '').toLowerCase();
-
-    return ADMIN_ROLES.has(roleName) || ADMIN_ROLES.has(roleType);
-  } catch (error) {
-    strapi.log.error('Error checking admin role:', error);
-    return false;
-  }
-}
-
-// Valid unified order status values
-type OrderStatus = 'pending' | 'paid' | 'printing' | 'printed' | 'assembling' | 'packaged' | 'shipped' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'canceled' | 'returned';
-
-// Helper function to map EasyPost status to order status
-function mapTrackingStatusToOrderStatus(trackingStatus: string): OrderStatus {
-  const statusMap: Record<string, OrderStatus> = {
-    'pre_transit': 'shipped',
-    'in_transit': 'in_transit',
-    'out_for_delivery': 'out_for_delivery',
-    'delivered': 'delivered',
-    'return_to_sender': 'returned',
-    'failure': 'returned',
-    'cancelled': 'canceled',
-    'error': 'shipped',
-    'unknown': 'shipped',
-  };
-  return statusMap[trackingStatus] || 'shipped';
-}
+import { ORDER_POPULATE_FULL } from '../../../services/order-populate';
+import { isAdmin } from '../../../services/admin-auth';
+import {
+  type OrderStatus,
+  ALL_ORDER_STATUSES,
+  VALID_TRANSITIONS,
+  isValidTransition,
+  mapTrackingStatusToOrderStatus,
+} from '../../../services/order-status';
 
 export default {
   // Validate an address
@@ -175,7 +135,8 @@ export default {
       return ctx.forbidden('Admin access required');
     }
 
-    const { status, search, page = 1, pageSize = 50 } = ctx.query;
+    const { status, search, page = 1, pageSize: rawPageSize = 50 } = ctx.query;
+    const pageSize = Math.min(Math.max(Number(rawPageSize) || 50, 1), 200);
 
     try {
       const filters: any = {};
@@ -267,18 +228,7 @@ export default {
 
       const updatedOrder = await strapi.entityService.update('api::order.order', id, {
         data: updateData,
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          shipping_box: true,
-          user: true,
-        },
+        populate: { ...ORDER_POPULATE_FULL, shipping_box: true },
       });
 
       if (!updateFields.admin_hidden) {
@@ -315,31 +265,29 @@ export default {
       send_email?: boolean;
     };
 
-    const validStatuses: OrderStatus[] = ['pending', 'paid', 'printing', 'printed', 'assembling', 'packaged', 'shipped', 'in_transit', 'out_for_delivery', 'delivered', 'canceled', 'returned'];
-    if (!order_status || !validStatuses.includes(order_status as OrderStatus)) {
-      return ctx.badRequest(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
+    if (!order_status || !ALL_ORDER_STATUSES.includes(order_status as OrderStatus)) {
+      return ctx.badRequest(`Invalid status. Must be one of: ${ALL_ORDER_STATUSES.join(', ')}`);
     }
 
     try {
       const order = await strapi.entityService.findOne('api::order.order', id, {
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       }) as any;
 
       if (!order) {
         return ctx.notFound('Order not found');
       }
 
-      const previousStatus = order.order_status;
+      const previousStatus = order.order_status as OrderStatus;
+
+      // Enforce state machine — prevent invalid transitions
+      if (previousStatus && !isValidTransition(previousStatus, order_status as OrderStatus)) {
+        return ctx.badRequest(
+          `Invalid status transition: "${previousStatus}" → "${order_status}". ` +
+          `Allowed transitions from "${previousStatus}": ${(VALID_TRANSITIONS[previousStatus] || []).join(', ') || 'none (terminal state)'}`
+        );
+      }
+
       const updateData: any = {
         order_status: order_status,
       };
@@ -385,17 +333,7 @@ export default {
 
       const updatedOrder = await strapi.entityService.update('api::order.order', id, {
         data: updateData,
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       });
 
       let emailResult: { success: boolean; reason?: string; sentTo?: string; bcc?: string; error?: string } = { success: false, reason: 'not_requested' };
@@ -453,17 +391,7 @@ export default {
 
     try {
       const order = await strapi.entityService.findOne('api::order.order', id, {
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       });
 
       if (!order) {
@@ -513,17 +441,7 @@ export default {
 
       const updatedOrder = await strapi.entityService.update('api::order.order', id, {
         data: updateData,
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       });
 
       // Send shipping notification email
@@ -572,17 +490,7 @@ export default {
 
     try {
       const order = await strapi.entityService.findOne('api::order.order', id, {
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       }) as any;
 
       if (!order) {
@@ -622,17 +530,7 @@ export default {
 
       const updatedOrder = await strapi.entityService.update('api::order.order', id, {
         data: updateData,
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       });
 
       try {
@@ -701,17 +599,7 @@ export default {
 
               const updatedOrder = await strapi.entityService.update('api::order.order', order.id, {
                 data: updateData,
-                populate: {
-                  shipping_address: true,
-                  billing_address: true,
-                  order_items: {
-                    populate: {
-                      product: true,
-                      order_item_parts: { populate: ['product_part', 'color'] },
-                    },
-                  },
-                  user: true,
-                },
+                populate: ORDER_POPULATE_FULL,
               });
 
               try {
@@ -853,17 +741,7 @@ export default {
 
         const updatedOrder = await strapi.entityService.update('api::order.order', orderId, {
           data: updateData,
-          populate: {
-            shipping_address: true,
-            billing_address: true,
-            order_items: {
-              populate: {
-                product: true,
-                order_item_parts: { populate: ['product_part', 'color'] },
-              },
-            },
-            user: true,
-          },
+          populate: ORDER_POPULATE_FULL,
         });
 
         try {
@@ -976,19 +854,7 @@ export default {
         filters: {
           ordered_at: { $gte: ninetyDaysAgo.toISOString() },
         },
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          shipping_box: true,
-          user: true,
-          discount_code: true,
-        },
+        populate: { ...ORDER_POPULATE_FULL, shipping_box: true, discount_code: true },
         sort: { ordered_at: 'desc' },
         limit: 500,
       }) as any[];
@@ -1047,17 +913,7 @@ export default {
     try {
       const orders = await strapi.entityService.findMany('api::order.order', {
         filters: { tracking_number: trackingNumber },
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       });
 
       if (orders.length === 0) {
@@ -1088,17 +944,7 @@ export default {
 
       const updatedOrder = await strapi.entityService.update('api::order.order', order.id, {
         data: updateData,
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       });
 
       strapi.log.info(`[TRACKING WEBHOOK] Updated order ${order.order_number}: ${previousStatus} → ${newOrderStatus}`);
@@ -1288,17 +1134,7 @@ export default {
 
     try {
       const order = await strapi.entityService.findOne('api::order.order', id, {
-        populate: {
-          shipping_address: true,
-          billing_address: true,
-          order_items: {
-            populate: {
-              product: true,
-              order_item_parts: { populate: ['product_part', 'color'] },
-            },
-          },
-          user: true,
-        },
+        populate: ORDER_POPULATE_FULL,
       }) as any;
 
       if (!order) {

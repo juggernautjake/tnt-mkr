@@ -1,10 +1,7 @@
 import { factories } from '@strapi/strapi';
-import Stripe from 'stripe';
 import Handlebars from 'handlebars';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2025-05-28.basil',
-});
+import stripe from '../../../services/stripe';
+import { ORDER_POPULATE_WEBHOOK } from '../../../services/order-populate';
 
 interface Order {
   id: number;
@@ -159,16 +156,7 @@ export default factories.createCoreService('api::webhook-event.webhook-event', (
 
       const orders = await strapi.db.query('api::order.order').findMany({
         where: { payment_intent_id: paymentIntentId },
-        populate: [
-          'user',
-          'shipping_address',
-          'billing_address',
-          'order_items.product',
-          'order_items.order_item_parts.product_part',
-          'order_items.order_item_parts.color',
-          'order_items.promotions',
-          'shipping_method',
-        ],
+        populate: [...ORDER_POPULATE_WEBHOOK],
       }) as Order[];
 
       if (orders.length === 0) {
@@ -287,16 +275,7 @@ export default factories.createCoreService('api::webhook-event.webhook-event', (
 
       const orders = await strapi.db.query('api::order.order').findMany({
         where: { payment_intent_id: paymentIntentId },
-        populate: [
-          'user',
-          'shipping_address',
-          'billing_address',
-          'order_items.product',
-          'order_items.order_item_parts.product_part',
-          'order_items.order_item_parts.color',
-          'order_items.promotions',
-          'shipping_method',
-        ],
+        populate: [...ORDER_POPULATE_WEBHOOK],
       }) as Order[];
 
       if (orders.length === 0) {
@@ -327,16 +306,7 @@ export default factories.createCoreService('api::webhook-event.webhook-event', (
 
       const updatedOrder = await strapi.db.query('api::order.order').findOne({
         where: { id: order.id },
-        populate: [
-          'user',
-          'shipping_address',
-          'billing_address',
-          'order_items.product',
-          'order_items.order_item_parts.product_part',
-          'order_items.order_item_parts.color',
-          'order_items.promotions',
-          'shipping_method',
-        ],
+        populate: [...ORDER_POPULATE_WEBHOOK],
       }) as Order;
 
       await this.sendConfirmationEmail(updatedOrder);

@@ -5,9 +5,6 @@ export default ({ env }) => ({
   app: {
     keys: env.array('APP_KEYS'),
   },
-  log: {
-    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-  },
   cron: {
     enabled: true,
   },
