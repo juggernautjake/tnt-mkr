@@ -1,0 +1,322 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS Variables */
+:root {
+  --background: #fefaf0;
+  --orange: #fe5100;
+  --text: var(--orange);
+  --font-geist-sans: "Geist Sans", Arial, sans-serif;
+  --font-geist-mono: "Geist Mono", monospace;
+  --angle: 0deg;
+  --gradient-start: #fe5100;
+  --gradient-betwixt-mid: #FF641C;
+  --gradient-mid: #ff7637;
+  --gradient-light: #FFBB9B;
+  --gradient-end: white;
+  --sale-bubble-bg: var(--orange);
+  --popup-bg: #faf0e2;
+  --page-background: radial-gradient(circle at top left, #fff 0%, #fefaf0 50%, #fefaf0 100%);
+  --light-blue: #24b6ff;
+  --secondary-text: #333;
+  --verse-border-color: #fe5100;
+  --light-gray: #e5e7eb;
+  --border-color: #ddd;
+  --card-bg: #fff;
+  --card-accent: #fff;
+  --error-color: #dc2626;
+  --success-color: #16a34a;
+  --gradient-color-1: #fe5100;
+  --gradient-color-2: #FF641C;
+  --gradient-color-3: #ff7637;
+  --gradient-color-4: #FFBB9B;
+  --gradient-color-5: white;
+}
+
+.dark {
+  --background: #1a1a2e;
+  --light-blue: #24b6ff;
+  --text: var(--light-blue);
+  --orange: #fe5100;
+  --gradient-start: #24b6ff;
+  --gradient-betwixt-mid: #4CC5FD;
+  --gradient-mid: #73d3fa;
+  --gradient-light: #B9E9FD;
+  --gradient-end: white;
+  --sale-bubble-bg: #24b6ff;
+  --popup-bg: #30306e;
+  --page-background: #1a1a2e;
+  --secondary-text: #d1d5db;
+  --verse-border-color: #24b6ff;
+  --light-gray: #374151;
+  --border-color: #4b5563;
+  --card-bg: #2a2a4a;
+  --card-accent: #3553c4;
+  --error-color: #f87171;
+  --success-color: #4ade80;
+  --gradient-color-1: #24b6ff;
+  --gradient-color-2: #4CC5FD;
+  --gradient-color-3: #73d3fa;
+  --gradient-color-4: #B9E9FD;
+  --gradient-color-5: white;
+}
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Apply transition to all elements for smooth theme switching */
+* {
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+html,
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+  max-width: 100vw;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-geist-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--page-background);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Base Button Styles */
+.baseButton {
+  position: relative;
+  padding: 0.8rem 1.2rem;
+  border-radius: 9999px;
+  font-weight: bold;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+  border: 2px solid var(--orange);
+  transform-origin: center;
+}
+
+.baseButtonFilled {
+  background-color: var(--orange);
+  color: white;
+}
+
+.baseButtonOutlined {
+  background: transparent;
+  color: var(--orange);
+}
+
+.baseButton:hover {
+  transform: scale(1.05);
+  border: 2px solid transparent;
+}
+
+.baseButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 2px;
+  background: transparent;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: none;
+}
+
+.baseButton:hover::before {
+  background: conic-gradient(
+    from var(--angle),
+    var(--gradient-start),
+    var(--gradient-mid),
+    var(--gradient-light),
+    var(--gradient-end),
+    var(--gradient-light),
+    var(--gradient-mid),
+    var(--gradient-start),
+    var(--gradient-start),
+    var(--gradient-mid),
+    var(--gradient-light),
+    var(--gradient-end),
+    var(--gradient-mid),
+    var(--gradient-start)
+  );
+  animation: rotateGradient 3s linear infinite;
+}
+
+@keyframes rotateGradient {
+  from {
+    --angle: 0deg;
+  }
+  to {
+    --angle: 360deg;
+  }
+}
+
+/* Shared spinner animation — used by multiple components */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Widgets Container */
+.widgets-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  padding: 2rem 1rem;
+}
+
+/* Product Widget Styling */
+.product-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+/* Product Image */
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+}
+
+/* Product Name */
+.product-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+/* Product Price */
+.product-price {
+  font-size: 1rem;
+  margin: 0.25rem 0;
+}
+
+/* Product Buttons */
+.product-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.product-buttons button {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* Responsive Adjustments for Very Small Screens */
+@media (max-width: 600px) {
+  .widgets-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 1rem 0.5rem;
+  }
+
+  .product-widget {
+    padding: 0.5rem;
+  }
+
+  .product-image {
+    height: 150px;
+  }
+
+  .product-name {
+    font-size: 1rem;
+  }
+
+  .product-price {
+    font-size: 0.875rem;
+  }
+
+  .product-buttons button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Cart Notification */
+.cart-notification {
+  background-color: var(--popup-bg);
+  border: 2px solid var(--text);
+  border-radius: 8px;
+  color: var(--orange);
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Promotion Carousel Arrows */
+.promo-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  color: var(--orange);
+  font-size: 1.2rem; /* Reduced from 2rem */
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  width: 24px; /* Reduced from 40px */
+  height: 24px; /* Reduced from 40px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background-color 0.2s;
+  border-radius: 50%;
+}
+
+.promo-arrow.left {
+  left: 10px;
+}
+
+.promo-arrow.right {
+  right: 10px;
+}
+
+.promo-arrow:hover {
+  color: white;
+  background-color: var(--orange);
+}
+
+.dark .promo-arrow {
+  color: #5a7dff;
+}
+
+.dark .promo-arrow:hover {
+  color: white;
+  background-color: #5a7dff;
+}
+
+.dark .social-icon:hover {
+  filter: brightness(100%) saturate(500%) invert(50%) sepia(90%) saturate(3000%) hue-rotate(175deg);
+}

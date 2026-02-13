@@ -1,0 +1,365 @@
+.productWidget {
+  flex: 0 0 300px;
+  position: relative;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  overflow: visible;
+}
+
+:global(.dark) .productWidget {
+  background-color: var(--card-accent);
+  background-image: radial-gradient(ellipse 100px 140px at 50% 50%, white -50%, transparent 135%);
+  color: white;
+  box-shadow: 0px 0px 30px -10px white;
+  border: white 2px solid;
+}
+
+.productInfo {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.productName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.productPrice {
+  color: var(--orange);
+  font-size: 1.1rem;
+  margin: 0.25rem 0;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+  color: #888;
+  margin-left: 0.5rem;
+}
+
+:global(.dark) .strikethrough {
+  color: white;
+}
+
+.productImage {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+  margin: 0.5rem 0;
+  transition: transform 0.2s ease-in-out;
+}
+
+.productImage:hover {
+  transform: scale(1.05);
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.cartButton {
+  background-color: var(--orange);
+  padding: 0.3rem 0.8rem;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 9999px;
+  transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  flex: 1;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.buyButton {
+  padding: 0.3rem 0.8rem;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 9999px;
+  color: var(--orange);
+  box-shadow: inset -2px 0 0 var(--orange), inset 0 -2px 0 var(--orange), inset 2px 0 0 var(--orange), inset 0 2px 0 var(--orange);
+  background: transparent;
+  transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  flex: 1;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:global(.dark) .buyButton {
+  background-color: var(--light-blue);
+  color: white;
+  box-shadow: none;
+}
+
+.cartButton:hover {
+  transform: scale(1.05);
+}
+
+.buyButton:hover {
+  transform: scale(1.05);
+}
+
+.cartButton:active {
+  transform: scale(0.95);
+}
+
+.buyButton:active {
+  transform: scale(0.95);
+}
+
+.cartButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 2px;
+  background: transparent;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: none;
+}
+
+.cartButton:hover::before {
+  background: conic-gradient(
+    from var(--angle),
+    #fe5100,
+    #ff7637,
+    #ffceb7,
+    white,
+    #ffceb7,
+    #ff7637,
+    #fe5100,
+    #fe5100,
+    #ff7637,
+    #ffceb7,
+    white,
+    #ff7637,
+    #fe5100
+  );
+  animation: rotateGradient 3s linear infinite;
+}
+
+.buyButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 2px;
+  background: transparent;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: none;
+}
+
+.buyButton:hover::before {
+  background: conic-gradient(
+    from var(--angle),
+    var(--gradient-start),
+    var(--gradient-mid),
+    var(--gradient-light),
+    var(--gradient-end),
+    var(--gradient-light),
+    var(--gradient-mid),
+    var(--gradient-start),
+    var(--gradient-start),
+    var(--gradient-mid),
+    var(--gradient-light),
+    var(--gradient-end),
+    var(--gradient-mid),
+    var(--gradient-start)
+  );
+  animation: rotateGradient 3s linear infinite;
+}
+
+.productPageLink {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--orange);
+  text-decoration: none;
+}
+
+:global(.dark) .productPageLink {
+  color: var(--light-blue);
+}
+
+:global(.dark) .productPageLink:hover {
+  color: var(--orange);
+}
+
+.productPageLink:hover {
+  text-decoration: underline;
+}
+
+.saleBubble {
+  --bubble-height: 30px;
+  position: absolute;
+  top: calc(-1 * var(--bubble-height) / 2);
+  left: 10px;
+  height: var(--bubble-height);
+  background: var(--sale-bubble-bg);
+  color: white;
+  padding: 0 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  z-index: 10;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.saleBubble::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--angle),
+    var(--gradient-start),
+    var(--gradient-mid),
+    var(--gradient-light),
+    var(--gradient-end),
+    var(--gradient-light),
+    var(--gradient-mid),
+    var(--gradient-start),
+    var(--gradient-start),
+    var(--gradient-mid),
+    var(--gradient-light),
+    var(--gradient-end),
+    var(--gradient-mid),
+    var(--gradient-start)
+  );
+  animation: rotateGradient 3s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.saleText {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 600px) {
+  .productWidget {
+    flex: 0 0 calc(50% - 0.75rem);
+    padding: 0.5rem;
+  }
+
+  :global(.dark) .productWidget {
+    background-color: var(--card-accent);
+    background-image: radial-gradient(ellipse 60px 100px at 50% 50%, white -50%, transparent 135%);
+    color: white;
+    box-shadow: 0px 0px 30px -10px white;
+    border: white 2px solid;
+  }
+
+  .productImage {
+    height: 120px;
+  }
+
+  .productName {
+    font-size: 1rem;
+  }
+
+  .productPrice {
+    font-size: 1rem;
+  }
+
+  .actionButtons {
+    flex-direction: row;
+    gap: 0.25rem;
+  }
+
+  .cartButton, .buyButton {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    flex: 1;
+    transition: transform 0.1s ease-in-out, background-color 0.1s ease-in-out;
+  }
+
+  .cartButton::before, .buyButton::before {
+    display: none;
+  }
+
+  /* Remove hover effect on small screens */
+  .cartButton:hover, .buyButton:hover {
+    transform: none;
+  }
+
+  .cartButton:active {
+    transform: scale(0.95);
+    background-color: #e64a00;
+    transition: transform 0.1s ease-in-out, background-color 0.1s ease-in-out;
+  }
+
+  .buyButton:active {
+    transform: scale(0.95);
+    background-color: #ffe6cc;
+    transition: transform 0.1s ease-in-out, background-color 0.1s ease-in-out;
+  }
+
+  :global(.dark) .cartButton:active {
+    background-color: #e64a00;
+    transform: scale(0.95);
+    transition: transform 0.1s ease-in-out, background-color 0.1s ease-in-out;
+  }
+
+  :global(.dark) .buyButton:active {
+    background-color: #1a8ed1;
+    transform: scale(0.95);
+    transition: transform 0.1s ease-in-out, background-color 0.1s ease-in-out;
+  }
+
+  .productPageLink {
+    font-size: 0.75rem;
+  }
+
+  .saleBubble {
+    --bubble-height: calc(50vw * 0.11);
+    font-size: max(12px, calc(50vw * 0.045));
+    padding: 0 calc(50vw * 0.035);
+    left: calc(50vw * 0.035);
+  }
+}
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotateGradient {
+  from {
+    --angle: 0deg;
+  }
+  to {
+    --angle: 360deg;
+  }
+}

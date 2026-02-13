@@ -1,0 +1,865 @@
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background-color: var(--background);
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+  background: var(--page-background);
+}
+
+.productContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.carousel {
+  position: relative;
+  width: 50%;
+  height: 375px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carouselInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+:global(.dark) .imageWrapper {
+  background: radial-gradient(ellipse 8.5rem 8.5rem at 50% 50%, #5a7dff 0%, #5a7dff 40%, transparent 135%);
+}
+
+.arrowButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+:global(.dark) .arrowButton {
+  background: #30306e;
+  color: #24b6ff;
+}
+
+.arrowButton svg {
+  stroke: var(--orange);
+  stroke-width: .3rem;
+}
+
+:global(.dark) .arrowButton svg {
+  stroke:  #24b6ff;
+  stroke-width: .3rem;
+}
+
+.arrowButton:hover {
+  background-color: var(--orange);
+}
+
+:global(.dark) .arrowButton:hover {
+  background-color: #24b6ff;
+}
+
+.arrowButton:hover svg {
+  stroke: white;
+}
+
+.arrowButton:first-child {
+  left: 10px;
+}
+
+.arrowButton:last-child {
+  right: 10px;
+}
+
+.productInfo {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.productTitle {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--orange);
+  align-self: flex-start;
+}
+
+.saleBubble {
+  --offset: 3px;
+  position: relative;
+  width: fit-content;
+  padding: 0 1rem;
+  height: 50px;
+  background: var(--orange);
+  border-radius: 25px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: white;
+  margin-top: 0;
+  margin-bottom: 0;
+  align-self: flex-start;
+  white-space: nowrap;
+}
+
+:global(.dark) .saleBubble {
+  background: var(--light-blue);
+}
+
+.saleBubble::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  z-index: 1;
+  background: conic-gradient(
+    from var(--angle),
+    var(--gradient-start),
+    var(--gradient-mid),
+    var(--gradient-light),
+    var(--gradient-end),
+    var(--gradient-light),
+    var(--gradient-mid),
+    var(--gradient-start),
+    var(--gradient-start),
+    var(--gradient-mid),
+    var(--gradient-light),
+    var(--gradient-end),
+    var(--gradient-mid),
+    var(--gradient-start)
+  );
+  border-radius: 27px;
+  animation: rotateGradient 3s linear infinite;
+}
+
+.saleBubble::after {
+  content: '';
+  position: absolute;
+  inset: var(--offset);
+  background: var(--orange);
+  border-radius: 25px;
+  z-index: 2;
+}
+
+:global(.dark) .saleBubble::after {
+  background: var(--light-blue);
+}
+
+.saleText {
+  position: relative;
+  z-index: 3;
+}
+
+.priceContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.productPrice {
+  font-size: 1.5rem;
+  color: var(--orange);
+  align-self: flex-start;
+}
+
+.offerEnds {
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+  margin-top: 0.25rem;
+}
+
+.termsLink {
+  color: var(--text);
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+.termsLink:hover {
+  color: var(--orange);
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+  color: var(--secondary-text);
+  margin-left: 0.5rem;
+}
+
+.productDescription {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--orange);
+  align-self: flex-start;
+}
+
+:global(.dark) .productDescription {
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  align-self: flex-start;
+}
+
+.colorTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text);
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  align-self: flex-start;
+}
+
+:global(.dark) .colorTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text);
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  align-self: flex-start;
+}
+
+.colorSections {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.partSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--orange);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+:global(.dark) .partSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--orange);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.partToggle {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--orange);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+:global(.dark) .partToggle {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.partToggle:hover {
+  color: var(--accent-color);
+}
+
+.toggleArrow {
+  color: var(--orange); /* Orange in light mode */
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+:global(.dark) .toggleArrow {
+  color: var(--light-blue); /* Light blue in dark mode */
+}
+
+.toggleArrow.closed {
+  transform: rotate(-90deg);
+}
+
+.partDetails {
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.partDescription {
+  font-size: 1rem;
+  color: var(--secondary-text);
+  margin-bottom: 0.5rem;
+}
+
+/* Color Bubbles - NOW WITH FLEX-WRAP FOR RESPONSIVE STACKING */
+.colorBubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.colorBubbleContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.colorBubble {
+  width: 40px;
+  height: 25px;
+  border-radius: 12.5px;
+  cursor: pointer;
+  border: 2px solid black;
+  transition: border-width 0.2s, border-color 0.2s;
+}
+
+:global(.dark) .colorBubble {
+  border-color: white;
+}
+
+.colorBubble.selected {
+  border: 3px solid var(--orange);
+}
+
+:global(.dark) .colorBubble.selected {
+  border: 3px solid #24b6ff;
+}
+
+.colorTooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--background);
+  border: 1px solid var(--accent-color);
+  padding: 0.5rem;
+  z-index: 10;
+  display: none;
+  white-space: nowrap;
+  pointer-events: none;
+  font-size: 0.8rem;
+  color: var(--text);
+}
+
+.colorBubbleContainer:hover .colorTooltip {
+  display: block;
+}
+
+.colorTooltip p {
+  margin: 0;
+  padding: 0;
+}
+
+.deviceInfo {
+  font-size: 1rem;
+  color: var(--secondary-text);
+  margin-top: 1rem;
+  align-self: flex-start;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  align-self: flex-start;
+}
+
+.cartButton {
+  position: relative;
+  padding: 0.8rem 1.2rem;
+  border-radius: 9999px;
+  font-weight: bold;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+  border: none;
+  background-color: var(--orange);
+  color: white;
+  transform-origin: center;
+}
+
+:global(.dark) .cartButton {
+  position: relative;
+  padding: 0.8rem 1.2rem;
+  border-radius: 9999px;
+  font-weight: bold;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+  border: none;
+  background-color: #24b6ff;
+  color: white;
+  transform-origin: center;
+}
+
+.buyButton {
+  position: relative;
+  padding: 0.8rem 1.2rem;
+  border-radius: 9999px;
+  font-weight: bold;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+  box-shadow: inset -3px 0 0 var(--orange), inset 0 -3px 0 var(--orange), inset 3px 0 0 var(--orange), inset 0 3px 0 var(--orange);
+  background: transparent;
+  color: var(--accent-color);
+  transform-origin: center;
+}
+
+:global(.dark) .buyButton {
+  position: relative;
+  padding: 0.8rem 1.2rem;
+  border-radius: 9999px;
+  font-weight: bold;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+  box-shadow: inset -3px 0 0 #24b6ff, inset 0 -3px 0 #24b6ff, inset 3px 0 0 #24b6ff, inset 0 3px 0 #24b6ff;
+  background: none;
+  color: white;
+  transform-origin: center;
+}
+
+.cartButton:hover {
+  transform: scale(1.05);
+  border: none;
+}
+
+.buyButton:hover {
+  transform: scale(1.05);
+  border: none;
+}
+
+.cartButton:active,
+.buyButton:active {
+  transform: scale(0.95);
+}
+
+.cartButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 3px;
+  background: transparent;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: none;
+}
+
+.buyButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 3px;
+  background: transparent;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: none;
+}
+
+:global(.dark) .buyButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 3px;
+  background: transparent;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: none;
+}
+
+.cartButton:hover::before {
+  background: conic-gradient(
+    from var(--angle),
+    #fe5100,
+    #ff7637,
+    #FFBB9B,
+    white,
+    #FFBB9B,
+    #ff7637,
+    #fe5100,
+    #fe5100,
+    #ff7637,
+    #FFBB9B,
+    white,
+    #ff7637,
+    #fe5100
+  );
+  animation: rotateGradient 3s linear infinite;
+}
+
+:global(.dark) .cartButton:hover::before {
+  background: conic-gradient(
+    from var(--angle),
+    #24b6ff,
+    #73d3fa,
+    #B9E9FD,
+    white,
+    #B9E9FD,
+    #73d3fa,
+    #24b6ff,
+    #24b6ff,
+    #73d3fa,
+    #B9E9FD,
+    white,
+    #73d3fa,
+    #24b6ff
+  );
+  animation: rotateGradient 3s linear infinite;
+}
+
+.buyButton:hover::before {
+  background: conic-gradient(
+    from var(--angle),
+    #fe5100,
+    #ff7637,
+    #FFBB9B,
+    white,
+    #FFBB9B,
+    #ff7637,
+    #fe5100,
+    #fe5100,
+    #ff7637,
+    #FFBB9B,
+    white,
+    #ff7637,
+    #fe5100
+  );
+  animation: rotateGradient 3s linear infinite;
+}
+
+:global(.dark) .buyButton:hover::before {
+  background: conic-gradient(
+    from var(--angle),
+    #24b6ff,
+    #73d3fa,
+    #B9E9FD,
+    white,
+    #B9E9FD,
+    #73d3fa,
+    #24b6ff,
+    #24b6ff,
+    #73d3fa,
+    #B9E9FD,
+    white,
+    #73d3fa,
+    #24b6ff
+  );
+  animation: rotateGradient 3s linear infinite;
+}
+
+.divider {
+  width: 100%;
+  height: 2px;
+  background-color: var(--accent-color);
+  margin: 2rem 0;
+}
+
+.bottomCarousel {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.carouselTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.carouselContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.carouselItem {
+  text-align: center;
+  background-color: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 200px;
+}
+
+:global(.dark) .carouselItem {
+  background-color: var(--popup-bg);
+}
+
+.carouselItem img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+
+.carouselItemTitle {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.carouselItemPrice {
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+}
+
+.carouselArrow {
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+}
+
+:global(.dark) .carouselArrow {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+@keyframes rotateGradient {
+  from {
+    --angle: 0deg;
+  }
+  to {
+    --angle: 360deg;
+  }
+}
+
+/* Individual Part Purchase Styles */
+.individualPartSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background-color: rgba(254, 81, 0, 0.05);
+  border-radius: 8px;
+  border: 1px dashed var(--orange);
+}
+
+:global(.dark) .individualPartSection {
+  background-color: rgba(36, 182, 255, 0.05);
+  border-color: #24b6ff;
+}
+
+.partPriceInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.partPriceInfo span:first-child {
+  font-size: 0.85rem;
+  color: var(--secondary-text);
+}
+
+.partPrice {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--orange);
+}
+
+:global(.dark) .partPrice {
+  color: #24b6ff;
+}
+
+.partOriginalPrice {
+  font-size: 0.85rem;
+  color: var(--secondary-text);
+  text-decoration: line-through;
+}
+
+.addPartButton {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--orange);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+:global(.dark) .addPartButton {
+  background-color: #24b6ff;
+}
+
+.addPartButton:hover {
+  transform: scale(1.05);
+  background-color: #ff7637;
+}
+
+:global(.dark) .addPartButton:hover {
+  background-color: #73d3fa;
+}
+
+.addPartButton:active {
+  transform: scale(0.95);
+}
+
+.addPartButton svg {
+  stroke-width: 2;
+}
+
+/* ==================== RESPONSIVE STYLES ==================== */
+
+@media (max-width: 768px) {
+  .main {
+    padding: 1rem;
+  }
+
+  .productContainer {
+    flex-direction: column;
+  }
+
+  .carousel,
+  .productInfo {
+    width: 100%;
+  }
+
+  .carousel {
+    height: 225px; /* 3/4 of 300px */
+  }
+
+  :global(.dark) .imageWrapper {
+    background: radial-gradient(ellipse 5.25rem 5.25rem at 50% 50%, #5a7dff 0%, #5a7dff 40%, transparent 135%);
+  }
+
+  .productTitle {
+    font-size: 1.5rem;
+  }
+
+  .toggleArrow {
+    font-size: 1.5rem;
+  }
+
+  /* Color bubbles - already wrapping due to flex-wrap, but adjust gap for mobile */
+  .colorBubbles {
+    gap: 0.4rem;
+  }
+
+  /* Slightly smaller bubbles on mobile for better fit */
+  .colorBubble {
+    width: 36px;
+    height: 22px;
+    border-radius: 11px;
+  }
+
+  .individualPartSection {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .addPartButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .actionButtons {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .cartButton,
+  .buyButton {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .main {
+    padding: 0.75rem;
+  }
+
+  .productTitle {
+    font-size: 1.25rem;
+  }
+
+  .colorTitle {
+    font-size: 1.25rem;
+  }
+
+  .partToggle {
+    font-size: 1rem;
+  }
+
+  /* Even smaller bubbles on very small screens */
+  .colorBubble {
+    width: 32px;
+    height: 20px;
+    border-radius: 10px;
+  }
+
+  .colorBubbles {
+    gap: 0.35rem;
+  }
+
+  .saleBubble {
+    font-size: 1rem;
+    height: 40px;
+    padding: 0 0.75rem;
+  }
+
+  .partPriceInfo {
+    flex-wrap: wrap;
+  }
+}

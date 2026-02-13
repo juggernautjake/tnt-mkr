@@ -1,0 +1,107 @@
+.ordersContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .orderList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .orderItem {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .orderHeader {
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .orderHeader:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .orderDetails {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  
+  .orderDetails.collapsed {
+    max-height: 0;
+  }
+  
+  .orderDetails.expanded {
+    max-height: 1000px; /* Large enough to accommodate content */
+    padding: 15px;
+  }
+  
+  .orderInfo {
+    margin-bottom: 10px;
+  }
+  
+  .itemsList {
+    margin-top: 10px;
+  }
+  
+  .item {
+    margin-bottom: 15px;
+  }
+  
+  .colorSelections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 5px;
+  }
+  
+  .colorBubbleContainer {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .colorBubble {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+  }
+  
+  .colorBubbleContainer:hover .colorTooltip {
+    display: block;
+  }
+  
+  .colorTooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 5px;
+    z-index: 10;
+    display: none;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    color: #333;
+  }
+  
+  .cancellationMessage {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #333;
+  }

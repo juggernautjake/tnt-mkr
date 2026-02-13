@@ -1,0 +1,103 @@
+/* Legal pages shared styles — mirrors faq.module.css patterns */
+
+/* Main container */
+.legalContainer {
+  max-width: 64rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem;
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+  background: var(--page-background);
+  color: var(--orange);
+}
+
+:global(.dark) .legalContainer {
+  background: var(--page-background);
+  color: var(--text);
+}
+
+/* Page title */
+.title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: var(--orange);
+}
+
+:global(.dark) .title {
+  color: var(--text);
+}
+
+/* Effective date / subtitle text */
+.effectiveDate {
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+  margin-bottom: 2rem;
+}
+
+:global(.dark) .effectiveDate {
+  color: var(--secondary-text);
+}
+
+/* Section heading */
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+  color: var(--orange);
+}
+
+:global(.dark) .sectionTitle {
+  color: var(--text);
+}
+
+/* Section container */
+.section {
+  margin-bottom: 2rem;
+}
+
+/* Content card */
+.content {
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  color: #000000;
+}
+
+:global(.dark) .content {
+  background-color: var(--popup-bg);
+  color: #ffffff;
+  box-shadow: 0px 0px 15px 4px #5a7dff;
+}
+
+/* Paragraph spacing */
+.paragraph {
+  margin-bottom: 1rem;
+}
+
+.paragraphSmall {
+  margin-bottom: 0.5rem;
+}
+
+/* Lists inside legal content */
+.list {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.list li {
+  margin-bottom: 0.35rem;
+}
+
+/* Link styles */
+.link {
+  color: var(--orange);
+  text-decoration: underline;
+}
+
+:global(.dark) .link {
+  color: var(--light-blue);
+}

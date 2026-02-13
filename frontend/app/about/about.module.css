@@ -1,0 +1,271 @@
+/* About Page Container */
+.aboutContainer {
+  max-width: 64rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+  background: var(--page-background);
+  color: var(--secondary-text);
+}
+
+:global(.dark) .aboutContainer {
+  background: var(--page-background);
+  color: var(--secondary-text);
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+}
+
+.heroHeadline {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--orange);
+  margin-bottom: 1rem;
+}
+
+:global(.dark) .heroHeadline {
+  color: var(--text);
+}
+
+.heroSubtext {
+  font-size: 1.125rem;
+  line-height: 1.75;
+  max-width: 40rem;
+  margin: 0 auto;
+  color: var(--secondary-text);
+}
+
+:global(.dark) .heroSubtext {
+  color: var(--secondary-text);
+}
+
+/* Section Shared */
+.section {
+  margin-bottom: 3rem;
+}
+
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--orange);
+}
+
+:global(.dark) .sectionTitle {
+  color: var(--text);
+}
+
+/* Content Card */
+.card {
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  color: #000000;
+}
+
+:global(.dark) .card {
+  background-color: var(--popup-bg);
+  color: #ffffff;
+  box-shadow: 0px 0px 15px 4px rgba(90, 125, 255, 0.4);
+}
+
+.cardText {
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.cardText:last-child {
+  margin-bottom: 0;
+}
+
+/* Values Grid */
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .valuesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.valueCard {
+  background-color: #faf0e2;
+  padding: 1.75rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+:global(.dark) .valueCard {
+  background-color: var(--popup-bg);
+  box-shadow: 0px 0px 15px 4px rgba(90, 125, 255, 0.4);
+}
+
+.valueIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+  line-height: 1;
+}
+
+.valueTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--orange);
+  margin-bottom: 0.5rem;
+}
+
+:global(.dark) .valueTitle {
+  color: var(--text);
+}
+
+.valueDescription {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #555;
+}
+
+:global(.dark) .valueDescription {
+  color: var(--secondary-text);
+}
+
+/* Team Grid */
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .teamGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.teamCard {
+  background-color: white;
+  padding: 1.75rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid var(--orange);
+}
+
+:global(.dark) .teamCard {
+  background-color: var(--popup-bg);
+  color: #ffffff;
+  box-shadow: 0px 0px 15px 4px rgba(90, 125, 255, 0.4);
+  border-left: 4px solid var(--text);
+}
+
+.teamName {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--orange);
+  margin-bottom: 0.25rem;
+}
+
+:global(.dark) .teamName {
+  color: var(--text);
+}
+
+.teamRole {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #777;
+  margin-bottom: 0.75rem;
+}
+
+:global(.dark) .teamRole {
+  color: #aaa;
+}
+
+.teamBio {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #333;
+}
+
+:global(.dark) .teamBio {
+  color: var(--secondary-text);
+}
+
+/* Future Section */
+.futureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.futureItem {
+  position: relative;
+  padding: 0.75rem 0 0.75rem 1.75rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  border-bottom: 1px solid #eee;
+}
+
+:global(.dark) .futureItem {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.futureItem:last-child {
+  border-bottom: none;
+}
+
+.futureItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 1.1rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--orange);
+}
+
+:global(.dark) .futureItem::before {
+  background-color: var(--text);
+}
+
+/* Accent Divider */
+.divider {
+  width: 4rem;
+  height: 3px;
+  background-color: var(--orange);
+  border: none;
+  margin: 0 0 1.5rem 0;
+  border-radius: 2px;
+}
+
+:global(.dark) .divider {
+  background-color: var(--text);
+}
+
+/* Responsive headline */
+@media (max-width: 640px) {
+  .heroHeadline {
+    font-size: 1.75rem;
+  }
+
+  .heroSubtext {
+    font-size: 1rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.5rem;
+  }
+}

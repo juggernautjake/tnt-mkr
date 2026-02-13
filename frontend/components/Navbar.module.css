@@ -1,0 +1,178 @@
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.verseButton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: transparent;
+  box-shadow: inset -3px 0 0 var(--orange), inset 0 -3px 0 var(--orange), inset 3px 0 0 var(--orange), inset 0 3px 0 var(--orange);
+  transition: transform 0.2s ease-in-out;
+}
+
+:global(.dark) .verseButton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: transparent;
+  box-shadow: inset -3px 0 0 var(--light-blue), inset 0 -3px 0 var(--light-blue), inset 3px 0 0 var(--light-blue), inset 0 3px 0 var(--light-blue);
+  transition: transform 0.2s ease-in-out;
+  color: white;
+}
+
+.verseButton:active {
+  transform: scale(1.05);
+}
+
+.verseButton:hover {
+  transform: scale(1.05);
+  background-color: var(--orange);
+  color: white;
+  box-shadow: none;
+}
+
+:global(.dark) .verseButton:hover {
+  transform: scale(1.05);
+  background-color: var(--light-blue);
+  color: white;
+  box-shadow: none;
+}
+
+.verseButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 3px;
+  background: transparent;
+  -webkit-mask: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0) content-box;
+  -webkit-mask-composite: source-out;
+  mask: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0) content-box;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.verseButton:hover::before {
+  opacity: 1;
+  background: conic-gradient(
+    from var(--angle),
+    var(--gradient-color-1),
+    var(--gradient-color-2),
+    var(--gradient-color-3),
+    var(--gradient-color-4),
+    var(--gradient-color-5),
+    var(--gradient-color-4),
+    var(--gradient-color-3),
+    var(--gradient-color-2),
+    var(--gradient-color-1),
+    var(--gradient-color-1),
+    var(--gradient-color-2),
+    var(--gradient-color-3),
+    var(--gradient-color-4),
+    var(--gradient-color-5),
+    var(--gradient-color-3),
+    var(--gradient-color-2),
+    var(--gradient-color-1)
+  );
+  animation: rotateGradient 3s linear infinite;
+}
+
+.active::before {
+  opacity: 1;
+  background: conic-gradient(
+    from var(--angle),
+    var(--gradient-color-1),
+    var(--gradient-color-2),
+    var(--gradient-color-3),
+    var(--gradient-color-4),
+    var(--gradient-color-5),
+    var(--gradient-color-4),
+    var(--gradient-color-3),
+    var(--gradient-color-2),
+    var(--gradient-color-1),
+    var(--gradient-color-1),
+    var(--gradient-color-2),
+    var(--gradient-color-3),
+    var(--gradient-color-4),
+    var(--gradient-color-5),
+    var(--gradient-color-3),
+    var(--gradient-color-2),
+    var(--gradient-color-1)
+  );
+  animation: rotateGradient 3s linear infinite;
+}
+
+/* Filter to change orange (#fe5100) to approximately #24b6ff */
+.blueFilter {
+  filter: brightness(0) saturate(100%) invert(45%) sepia(90%) saturate(2000%) hue-rotate(180deg);
+}
+
+/* White filter for fish image on hover */
+.whiteFilter {
+  filter: brightness(0) invert(1);
+}
+
+/* Theme toggle button styling */
+.themeToggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: transparent; /* No background by default */
+  transition: background-color 0.2s ease-in-out;
+}
+
+.themeIcon {
+  width: 24px; /* Matches w-6 */
+  height: 24px; /* Matches h-6 */
+  color: var(--orange); /* Light mode default */
+  transition: color 0.2s ease-in-out;
+}
+
+:global(.dark) .themeIcon {
+  color: var(--light-blue); /* Dark mode default */
+}
+
+/* Hover effects applied to the entire button */
+.themeToggle:hover {
+  background-color: var(--orange); /* Light mode hover background */
+}
+
+.themeToggle:hover .themeIcon {
+  color: var(--light-blue); /* Light mode hover icon */
+}
+
+:global(.dark) .themeToggle:hover {
+  background-color: var(--light-blue); /* Dark mode hover background */
+}
+
+:global(.dark) .themeToggle:hover .themeIcon {
+  color: var(--orange); /* Dark mode hover icon */
+}
+
+/* Fish image hover effect */
+.verseButton:hover img {
+  filter: brightness(0) invert(1); /* Apply white filter on hover */
+}
+
+@keyframes rotateGradient {
+  from {
+    --angle: 0deg;
+  }
+  to {
+    --angle: 360deg;
+  }
+}
+
+/* Active state for nav links */
+.active {
+  background-color: #fe5100;
+  color: white;
+}

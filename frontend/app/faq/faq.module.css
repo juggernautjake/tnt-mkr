@@ -1,0 +1,79 @@
+/* Main container styles */
+.faqContainer {
+    max-width: 64rem; /* max-w-4xl */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2rem; /* px-4 py-8 */
+    min-height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    background: var(--page-background); /* Matches light mode gradient */
+    color: var(--orange);
+  }
+  
+  :global(.dark) .faqContainer {
+    background: var(--page-background); /* Dark navy background */
+    color: var(--text);
+  }
+  
+  /* Heading styles */
+  .title {
+    font-size: 1.875rem; /* text-3xl */
+    font-weight: bold;
+    margin-bottom: 1.5rem; /* mb-6 */
+    color: var(--orange);
+  }
+  
+  :global(.dark) .title {
+    color: var(--text); /* Matches dark mode text color */
+  }
+  
+  /* Section heading styles */
+  .sectionTitle {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: bold;
+    margin-bottom: 0.75rem; /* mb-3 */
+    color: var(--orange);
+  }
+  
+  :global(.dark) .sectionTitle {
+    color: var(--text);
+  }
+  
+  /* Section container styles */
+  .section {
+    margin-bottom: 2rem; /* mb-8 */
+  }
+  
+  /* Content container styles */
+  .content {
+    background-color: white;
+    padding: 1rem; /* p-4 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem; /* rounded */
+    color: #000000; /* text-black */
+  }
+  
+  :global(.dark) .content {
+    background-color: var(--popup-bg); /* #30306e for dark mode */
+    color: #ffffff; /* White text for readability */
+    box-shadow: 0px 0px 15px 4px #5a7dff; /* Matches dark mode shadow */
+  }
+  
+  /* Paragraph styles */
+  .paragraph {
+    margin-bottom: 1rem; /* mb-4 */
+  }
+  
+  .paragraphSmall {
+    margin-bottom: 0.5rem; /* mb-2 */
+  }
+  
+  /* Link styles */
+  .link {
+    color: var(--orange);
+    text-decoration: underline;
+  }
+  
+  :global(.dark) .link {
+    color: var(--light-blue);
+  }

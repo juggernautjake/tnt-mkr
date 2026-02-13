@@ -1,0 +1,379 @@
+.container {
+  margin-bottom: 1.5rem;
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: #f5f5f5;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  text-align: center;
+}
+
+:global(.dark) .placeholder {
+  background-color: #1f2937;
+  border-color: #4b5563;
+}
+
+.placeholderIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.placeholder p {
+  color: #666;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+:global(.dark) .placeholder p {
+  color: #9ca3af;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--orange);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+:global(.dark) .spinner {
+  border-color: #374151;
+  border-top-color: var(--light-blue);
+}
+
+
+.loading p {
+  color: #666;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+:global(.dark) .loading p {
+  color: #9ca3af;
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+}
+
+:global(.dark) .error {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.errorIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.errorTitle {
+  font-weight: 600;
+  color: #991b1b;
+  margin: 0 0 0.25rem 0;
+}
+
+:global(.dark) .errorTitle {
+  color: #fca5a5;
+}
+
+.errorMessage {
+  color: #b91c1c;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+:global(.dark) .errorMessage {
+  color: #fca5a5;
+}
+
+.noRates {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  text-align: center;
+}
+
+:global(.dark) .noRates {
+  background-color: #1f2937;
+}
+
+.noRatesIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.noRates p {
+  color: #666;
+  margin: 0;
+}
+
+:global(.dark) .noRates p {
+  color: #9ca3af;
+}
+
+.noRatesHint {
+  font-size: 0.85rem;
+  margin-top: 0.5rem !important;
+  color: #888 !important;
+}
+
+:global(.dark) .noRatesHint {
+  color: #6b7280 !important;
+}
+
+.fallbackNotice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #1e40af;
+  margin-bottom: 1rem;
+}
+
+:global(.dark) .fallbackNotice {
+  background-color: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93c5fd;
+}
+
+.manufacturingNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #92400e;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+:global(.dark) .manufacturingNotice {
+  background-color: rgba(251, 191, 36, 0.15);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: #fcd34d;
+}
+
+.ratesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rateOption {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+:global(.dark) .rateOption {
+  border-color: #4b5563;
+  background-color: #1f2937;
+}
+
+.rateOption:hover {
+  border-color: #d1d5db;
+  background-color: #fafafa;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+:global(.dark) .rateOption:hover {
+  border-color: #6b7280;
+  background-color: #374151;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.rateOption.selected {
+  border-color: var(--orange);
+  background-color: #fff7ed;
+  box-shadow: 0 0 0 3px rgba(254, 81, 0, 0.1);
+}
+
+:global(.dark) .rateOption.selected {
+  border-color: var(--light-blue);
+  background-color: rgba(90, 125, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(90, 125, 255, 0.1);
+}
+
+.radioInput {
+  margin-right: 1rem;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--orange);
+  cursor: pointer;
+}
+
+:global(.dark) .radioInput {
+  accent-color: var(--light-blue);
+}
+
+.rateContent {
+  flex: 1;
+}
+
+.rateHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.carrierLogo {
+  font-size: 1rem;
+}
+
+.serviceIcon {
+  font-size: 1.1rem;
+}
+
+.serviceName {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 1rem;
+}
+
+:global(.dark) .serviceName {
+  color: var(--text);
+}
+
+.guarantee {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  background-color: #dcfce7;
+  color: #166534;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+:global(.dark) .guarantee {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+.rateDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.serviceDescription {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+:global(.dark) .serviceDescription {
+  color: #9ca3af;
+}
+
+.deliveryTime {
+  font-size: 0.85rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+:global(.dark) .deliveryTime {
+  color: #d1d5db;
+}
+
+.ratePrice {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--orange);
+  white-space: nowrap;
+  margin-left: 1rem;
+}
+
+:global(.dark) .ratePrice {
+  color: var(--light-blue);
+}
+
+.handlingNote {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+:global(.dark) .handlingNote {
+  color: #6b7280;
+}
+
+@media (max-width: 600px) {
+  .rateOption {
+    flex-wrap: wrap;
+    padding: 1rem;
+  }
+
+  .radioInput {
+    margin-right: 0.75rem;
+  }
+
+  .rateContent {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .rateHeader {
+    flex-wrap: wrap;
+  }
+
+  .serviceName {
+    font-size: 0.95rem;
+  }
+
+  .ratePrice {
+    width: 100%;
+    text-align: right;
+    margin-top: 0.75rem;
+    margin-left: 0;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+    font-size: 1.25rem;
+  }
+
+  :global(.dark) .ratePrice {
+    border-top-color: #374151;
+  }
+}

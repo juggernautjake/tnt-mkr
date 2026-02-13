@@ -1,0 +1,176 @@
+.productCard {
+  text-decoration: none;
+  color: inherit;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  box-shadow: 8px 8px 10px rgba(0, 0, 0, 0.2);
+  width: 250px;
+  height: 340px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 1rem;
+  cursor: pointer;
+  position: relative;
+}
+
+:global(.dark) .productCard {
+  box-shadow: 0px 0px 15px 4px #5a7dff;
+  background: radial-gradient(ellipse 83px 117px at 50% 50%, white -50%, transparent 135%);
+  border: 2px solid white;
+  background-color: var(--card-accent);
+}
+
+.productCard:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out;
+}
+
+.imageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.productImage {
+  width: 100%;
+  height: auto;
+  max-height: 160px;
+  object-fit: contain;
+}
+
+.productName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0.5rem 0;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 2; /* Ensures title stays above image */
+}
+
+.productPrice {
+  font-size: 1.6rem;
+  color: var(--orange);
+  text-align: center;
+  margin: 1.0rem 0;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+  color: #888;
+  margin-right: 0.6rem;
+}
+
+:global(.dark) .productCard .strikethrough {
+  color: white;
+}
+
+.saleBubble {
+  --bubble-height: 30px;
+  --offset: 2px;
+  background: var(--sale-bubble-bg);
+  border-radius: 20px;
+  position: absolute;
+  top: calc(-1 * var(--bubble-height) / 2);
+  left: 10px;
+  height: var(--bubble-height);
+  padding: 0 10px;
+  width: auto;
+  overflow: hidden;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.saleBubble::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  z-index: 1;
+  background: conic-gradient(
+    from var(--angle),
+    var(--gradient-start),
+    var(--gradient-mid),
+    var(--gradient-light),
+    var(--gradient-end),
+    var(--gradient-light),
+    var(--gradient-mid),
+    var(--gradient-start),
+    var(--gradient-start),
+    var(--gradient-mid),
+    var(--gradient-light),
+    var(--gradient-end),
+    var(--gradient-mid),
+    var(--gradient-start)
+  );
+  border-radius: 22px;
+  animation: rotateGradient 3s linear infinite;
+}
+
+.saleBubble::after {
+  content: '';
+  background: var(--sale-bubble-bg);
+  border-radius: 20px;
+  position: absolute;
+  inset: var(--offset);
+  height: calc(100% - 2 * var(--offset));
+  width: calc(100% - 2 * var(--offset));
+  z-index: 2;
+}
+
+.saleText {
+  position: relative;
+  z-index: 3;
+}
+
+@keyframes rotateGradient {
+  from {
+    --angle: 0deg;
+  }
+  to {
+    --angle: 360deg;
+  }
+}
+
+@media (max-width: 768px) {
+  .productCard {
+    width: 50vw;
+    height: calc(50vw * 4 / 3);
+    padding: 0.75rem;
+  }
+  .productImage {
+    max-height: calc((50vw * 4 / 3) * 1 / 2);
+  }
+  .productName {
+    font-size: max(16px, calc(50vw * 0.07));
+    margin: 0.25rem 0;
+  }
+  .productPrice {
+    font-size: max(18px, calc(50vw * 0.08));
+    margin: 0.5rem 0;
+  }
+  .saleBubble {
+    --bubble-height: calc(50vw * 0.11);
+    font-size: max(12px, calc(50vw * 0.045));
+    padding: 0 calc(50vw * 0.035);
+    left: calc(50vw * 0.035);
+  }
+}
+
+/* Ensure text visibility in dark mode */
+:global(.dark) .productCard .productName,
+:global(.dark) .productCard .productPrice {
+  color: var(--orange);
+}

@@ -1,0 +1,142 @@
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.product-card-viewer {
+  padding: 0 10px; /* Space for arrows, matching promoViewer */
+  height: calc(53vw * 4 / 3); /* Matches card height plus padding */
+  margin-top: 8.0rem;
+}
+
+.promoViewer {
+  margin-top: 30px;
+  margin-bottom: 70px;
+}
+
+.promo-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  color: var(--orange);
+  font-size: 1.5rem;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background-color 0.2s;
+  border-radius: 50%;
+}
+
+.promo-arrow.left {
+  left: 10px;
+}
+
+.promo-arrow.right {
+  right: 10px;
+}
+
+.cartButton {
+  position: relative;
+  padding: 0.8rem 3rem;
+  border-radius: 9999px;
+  font-weight: bold;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+  border: none;
+  background-color: var(--orange);
+  color: white;
+  transform-origin: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 9.375rem; /* 150px */
+}
+
+:global(.dark) .cartButton {
+  background-color: var(--light-blue);
+  transform-origin: center;
+}
+
+.cartButton:hover {
+  transform: scale(1.08);
+  transform-origin: center;
+  background-color: var(--orange); /* orange-600 */
+}
+
+:global(.dark) .cartButton:hover {
+  background-color: var(--light-blue);
+  transform-origin: center;
+}
+
+.cartButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 3px;
+  background: transparent;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  transform-origin: center;
+  z-index: -1;
+}
+
+.cartButton:hover::before {
+  background: conic-gradient(
+    from var(--angle),
+    var(--gradient-start),
+    var(--gradient-mid),
+    var(--gradient-light),
+    var(--gradient-end),
+    var(--gradient-light),
+    var(--gradient-mid),
+    var(--gradient-start),
+    var(--gradient-start),
+    var(--gradient-mid),
+    var(--gradient-light),
+    var(--gradient-end),
+    var(--gradient-mid),
+    var(--gradient-start)
+  );
+  animation: rotateGradient 3s linear infinite;
+}
+
+.cartButtonFilled {
+  background-color: var(--orange);
+  color: white;
+}
+
+:global(.dark) .cartButtonFilled {
+  background-color: var(--light-blue);
+}
+
+@keyframes rotateGradient {
+  from {
+    --angle: 0deg;
+  }
+  to {
+    --angle: 360deg;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-card-viewer {
+    padding: 0 40px; /* Space for arrows, matching promoViewer */
+    height: calc(55vw * 4 / 3 + 5px); /* Matches card height plus padding */
+    margin-top: 1.5rem;
+  }
+  .promoViewer {
+    padding: 0 40px; /* Space for arrows */
+    margin-top: 30px; /* Increased top margin to prevent cutoff */
+    margin-bottom: 70px; /* Increased bottom margin to prevent cutoff */
+  }
+}

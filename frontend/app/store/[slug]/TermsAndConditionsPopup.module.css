@@ -1,0 +1,60 @@
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.content {
+  background: var(--popup-bg);
+  padding: 2rem;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 900px;
+  position: relative;
+  border: 2px solid var(--text);
+  box-sizing: border-box;
+  color: var(--text);
+}
+
+.termsWrapper {
+  max-height: 69vh;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.termsWrapper h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.closeButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: 2px solid var(--text);
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.termsText {
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  color: var(--secondary-text);
+}

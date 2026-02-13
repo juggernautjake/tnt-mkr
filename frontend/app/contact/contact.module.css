@@ -1,0 +1,298 @@
+/* Main container styles */
+.contactContainer {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  border: 3px solid var(--orange);
+  max-width: 28rem;
+  width: 100%;
+}
+
+:global(.dark) .contactContainer {
+  background-color: var(--popup-bg);
+  border: 3px solid var(--light-blue);
+  box-shadow: 0px 0px 15px 4px #5a7dff;
+}
+
+/* Heading styles */
+.title {
+  font-size: 1.875rem; /* 3xl = 30px */
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: var(--orange);
+}
+
+:global(.dark) .title {
+  color: var(--text);
+}
+
+/* Paragraph styles */
+.description {
+  margin-bottom: 1rem;
+  color: var(--orange);
+}
+
+:global(.dark) .description {
+  color: #9ca3af; /* gray-400 */
+}
+
+/* Form styles */
+.contactForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formLabel {
+  color: var(--blue);
+}
+
+.formInput,
+.formTextarea {
+  padding: 0.75rem; /* p-3 */
+  border: 1px solid var(--orange);
+  border-radius: 0.25rem;
+  background-color: #e5e7eb; /* gray-200 */
+  color: black;
+  font-family: 'Roboto', sans-serif;
+  transition: all 0.3s;
+}
+
+.formInput::placeholder,
+.formTextarea::placeholder {
+  color: var(--orange);
+}
+
+.formInput:focus,
+.formTextarea:focus {
+  border-color: var(--orange);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--orange); /* focus:ring-2 */
+  background-color: white;
+}
+
+:global(.dark) .formInput,
+:global(.dark) .formTextarea {
+  border-color: var(--light-blue);
+  background-color: #1f2937; /* gray-800 */
+  color: white;
+}
+
+:global(.dark) .formInput::placeholder,
+:global(.dark) .formTextarea::placeholder {
+  color: #d1d5db; /* gray-300 */
+}
+
+:global(.dark) .formInput:focus,
+:global(.dark) .formTextarea:focus {
+  border-color: var(--light-blue);
+  box-shadow: 0 0 0 2px var(--light-blue);
+  background-color: #1f2937; /* Maintain dark bg on focus */
+}
+
+/* Error state for inputs */
+.inputError {
+  border-color: #ef4444; /* red-500 */
+}
+
+:global(.dark) .inputError {
+  border-color: #fca5a5; /* red-300 */
+}
+
+/* Button styles */
+.formButton {
+  background-color: var(--orange);
+  color: white;
+  padding: 0.5rem 1rem; /* py-2 px-4 */
+  border-radius: 0.25rem;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  transition: background-color 0.2s;
+}
+
+.formButton:hover {
+  background-color: #c85200;
+}
+
+:global(.dark) .formButton {
+  background-color: var(--light-blue);
+}
+
+:global(.dark) .formButton:hover {
+  background-color: #1a8ed1;
+}
+
+.formButtonDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Message styles */
+.successMessage {
+  color: #10b981; /* green-500 */
+}
+
+:global(.dark) .successMessage {
+  color: #6ee7b7; /* green-300 */
+}
+
+.errorMessage,
+.errorText {
+  color: #ef4444; /* red-500 */
+}
+
+:global(.dark) .errorMessage,
+:global(.dark) .errorText {
+  color: #fca5a5; /* red-300 */
+}
+
+/* Order number wrapper styles */
+.orderNumberWrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--orange);
+  border-radius: 0.25rem;
+  background-color: #e5e7eb; /* Matches formInput */
+}
+
+:global(.dark) .orderNumberWrapper {
+  border-color: var(--light-blue);
+  background-color: #1f2937; /* Matches formInput dark mode */
+}
+
+.orderPrefix {
+  padding: 0.75rem;
+  color: var(--orange);
+  font-weight: bold;
+}
+
+:global(.dark) .orderPrefix {
+  color: var(--light-blue);
+}
+
+.orderNumberInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.75rem;
+  color: black;
+  font-family: 'Roboto', sans-serif;
+  outline: none;
+}
+
+:global(.dark) .orderNumberInput {
+  color: white;
+}
+
+.orderNumberInput::placeholder {
+  color: #aab7c4; /* Grey placeholder */
+}
+
+:global(.dark) .orderNumberInput::placeholder {
+  color: #d1d5db; /* Grey placeholder in dark mode */
+}
+
+.orderNumberWrapper:focus-within {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 2px var(--orange);
+}
+
+:global(.dark) .orderNumberWrapper:focus-within {
+  border-color: var(--light-blue);
+  box-shadow: 0 0 0 2px var(--light-blue);
+}
+
+/* Popup styles (copied from checkout.module.css) */
+.popupBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.confirmDialog {
+  background-color: var(--popup-bg);
+  border: 2px solid #fe5100;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 300px;
+  width: 280px;
+  text-align: center;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fe5100;
+  font-weight: 700;
+}
+
+:global(.dark) .confirmDialog {
+  background-color: var(--popup-bg);
+  border: 2px solid #24b6ff;
+  color: #24b6ff;
+}
+
+.confirmDialog p {
+  margin-bottom: 1rem;
+  color: inherit;
+}
+
+.primaryButton,
+.secondaryButton {
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  height: 40px;
+  line-height: 1;
+  margin: 5px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.primaryButton {
+  background-color: var(--orange);
+  color: white;
+  border: none;
+}
+
+.primaryButton:hover {
+  background-color: #c85200;
+}
+
+:global(.dark) .primaryButton {
+  background-color: #fe5100;
+  color: white;
+}
+
+:global(.dark) .primaryButton:hover {
+  background-color: #c85200;
+}
+
+.secondaryButton {
+  background-color: transparent;
+  color: #fe5100;
+  border: 2px solid #fe5100;
+}
+
+.secondaryButton:hover {
+  background-color: #fe5100;
+  color: white;
+}
+
+:global(.dark) .secondaryButton {
+  background-color: #24b6ff;
+  color: white;
+  border: none;
+}
+
+:global(.dark) .secondaryButton:hover {
+  background-color: #1a8ed1;
+}

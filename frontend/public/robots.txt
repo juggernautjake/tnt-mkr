@@ -1,0 +1,11 @@
+# robots.txt for www.tnt-mkr.com
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /checkout/order-confirmation
+Disallow: /account/
+Disallow: /confirmation/
+Disallow: /reset-password
+
+Sitemap: https://www.tnt-mkr.com/sitemap.xml

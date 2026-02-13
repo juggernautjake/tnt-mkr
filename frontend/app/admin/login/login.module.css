@@ -1,0 +1,391 @@
+/* Admin Login Page Styles */
+
+/* Light mode gradient background */
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #fefaf0 0%, #fff5e6 25%, #ffe4cc 50%, #ffd9b3 75%, #ffe4cc 100%);
+  position: relative;
+}
+
+/* Dark mode gradient background */
+:global(.dark) .container {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a3a5c 75%, #0f3460 100%);
+}
+
+/* Theme Toggle Button */
+.themeToggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #fe5100;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.themeToggle:hover {
+  background: #fe5100;
+  transform: scale(1.05);
+}
+
+.themeToggle:hover .themeIcon {
+  color: white;
+}
+
+:global(.dark) .themeToggle {
+  background: #2d2d4a;
+  border-color: #24b6ff;
+}
+
+:global(.dark) .themeToggle:hover {
+  background: #24b6ff;
+}
+
+.themeIcon {
+  width: 20px;
+  height: 20px;
+  color: #fe5100;
+  transition: color 0.2s;
+}
+
+:global(.dark) .themeIcon {
+  color: #24b6ff;
+}
+
+/* Loading State */
+.loadingState {
+  text-align: center;
+  color: #333;
+}
+
+:global(.dark) .loadingState {
+  color: white;
+}
+
+.loadingState p {
+  margin-top: 16px;
+  font-size: 16px;
+}
+
+/* Login Card */
+.loginCard {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: 3px solid #fe5100;
+}
+
+:global(.dark) .loginCard {
+  background: #2d2d4a;
+  border-color: #24b6ff;
+  box-shadow: 0px 0px 30px 5px rgba(90, 125, 255, 0.3);
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logo {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.title {
+  color: #fe5100;
+  font-size: 28px;
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+:global(.dark) .title {
+  color: #24b6ff;
+}
+
+.adminBadge {
+  background: #fe5100;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+
+:global(.dark) .adminBadge {
+  background: #24b6ff;
+}
+
+.header p {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+}
+
+:global(.dark) .header p {
+  color: #aaa;
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Error Message */
+.error {
+  background: #ffebee;
+  color: #c62828;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #ffcdd2;
+}
+
+:global(.dark) .error {
+  background: rgba(198, 40, 40, 0.15);
+  color: #ef9a9a;
+  border-color: rgba(198, 40, 40, 0.3);
+}
+
+.errorIcon {
+  flex-shrink: 0;
+}
+
+/* Form Groups */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+:global(.dark) .formGroup label {
+  color: #ddd;
+}
+
+.formGroup input {
+  padding: 14px 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+  background: white;
+  color: #333;
+}
+
+:global(.dark) .formGroup input {
+  background: #1a1a2e;
+  border-color: #444;
+  color: white;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: #fe5100;
+  box-shadow: 0 0 0 3px rgba(254, 81, 0, 0.1);
+}
+
+:global(.dark) .formGroup input:focus {
+  border-color: #24b6ff;
+  box-shadow: 0 0 0 3px rgba(36, 182, 255, 0.1);
+}
+
+.formGroup input::placeholder {
+  color: #999;
+}
+
+:global(.dark) .formGroup input::placeholder {
+  color: #666;
+}
+
+.formGroup input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Password Wrapper */
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordWrapper input {
+  padding-right: 48px;
+}
+
+.togglePassword {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.togglePassword:hover {
+  opacity: 1;
+}
+
+/* Submit Button */
+.submitButton {
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #fe5100 0%, #d94500 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(254, 81, 0, 0.4);
+}
+
+:global(.dark) .submitButton {
+  background: linear-gradient(135deg, #24b6ff 0%, #1a8ed1 100%);
+}
+
+:global(.dark) .submitButton:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(36, 182, 255, 0.4);
+}
+
+.submitButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Spinners */
+.spinner,
+.buttonSpinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border-width: 3px;
+  border-color: #ddd;
+  border-top-color: #fe5100;
+}
+
+:global(.dark) .spinner {
+  border-color: #444;
+  border-top-color: #24b6ff;
+}
+
+
+/* Footer */
+.footer {
+  margin-top: 24px;
+  text-align: center;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+}
+
+:global(.dark) .footer {
+  border-color: #444;
+}
+
+.footer p {
+  color: #999;
+  font-size: 13px;
+  margin: 0 0 12px 0;
+}
+
+:global(.dark) .footer p {
+  color: #888;
+}
+
+.backLink {
+  color: #fe5100;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.backLink:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+:global(.dark) .backLink {
+  color: #24b6ff;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .loginCard {
+    padding: 24px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .logo {
+    font-size: 40px;
+  }
+  
+  .themeToggle {
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+  }
+}

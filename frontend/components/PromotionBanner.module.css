@@ -1,0 +1,61 @@
+/* Large Screen Styling (default) */
+.promotionBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+  max-width: 42rem;
+  width: 100%;
+  background-color: var(--orange);
+  color: white;
+  cursor: pointer;
+  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.promotionBanner:hover {
+  background-color: #d86100;
+}
+
+.promotionBanner p {
+  text-align: center;
+  margin: 0;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+  text-decoration-thickness: 4px;
+  text-decoration-color: #333;
+  color: white;
+}
+
+/* Small Screen Styling */
+@media (max-width: 767px) {
+  .promotionBanner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    max-width: 100%;
+    width: 95%;
+    padding: 1rem 1.5rem;
+    margin: 1rem auto;
+    border-radius: 0.75rem;
+    background-color: var(--orange);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    display: block;
+  }
+
+  .promotionBanner:hover {
+    background-color: #ff7637;
+  }
+
+  .promotionBanner p {
+    text-align: center; /* Changed from left to center */
+  }
+}
