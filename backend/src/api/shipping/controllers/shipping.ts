@@ -153,6 +153,9 @@ export default {
         ];
       }
 
+      // Always exclude archived/hidden orders from the main admin view
+      filters.admin_hidden = { $ne: true };
+
       const orders = await strapi.entityService.findMany('api::order.order', {
         filters,
         sort: { ordered_at: 'desc' },
@@ -163,7 +166,7 @@ export default {
               order_item_parts: {
                 populate: {
                   product_part: { fields: ['id', 'name', 'weight_oz'] },
-                  color: { fields: ['id', 'name'] },
+                  color: { fields: ['id', 'name', 'hex_codes', 'type'] },
                 },
               },
             },
@@ -194,6 +197,93 @@ export default {
     }
   },
 
+  // Admin: Get archived (hidden) orders
+  async getArchivedOrders(ctx: Context) {
+    if (!await isAdmin(ctx)) {
+      return ctx.forbidden('Admin access required');
+    }
+
+    const { search, page = 1, pageSize: rawPageSize = 50 } = ctx.query;
+    const pageSize = Math.min(Math.max(Number(rawPageSize) || 50, 1), 200);
+
+    try {
+      const filters: any = { admin_hidden: true };
+      if (search) {
+        filters.$or = [
+          { order_number: { $containsi: search } },
+          { customer_name: { $containsi: search } },
+          { customer_email: { $containsi: search } },
+          { guest_email: { $containsi: search } },
+        ];
+      }
+
+      const orders = await strapi.entityService.findMany('api::order.order', {
+        filters,
+        sort: { archived_at: 'desc' } as any,
+        populate: {
+          order_items: {
+            populate: {
+              product: { fields: ['id', 'name'] },
+              order_item_parts: {
+                populate: {
+                  product_part: { fields: ['id', 'name'] },
+                  color: { fields: ['id', 'name'] },
+                },
+              },
+            },
+          },
+          shipping_address: true,
+          user: { fields: ['id', 'email'] },
+        },
+        start: (Number(page) - 1) * Number(pageSize),
+        limit: Number(pageSize),
+      });
+
+      const total = await strapi.db.query('api::order.order').count({ where: filters });
+
+      return ctx.send({
+        orders,
+        pagination: {
+          page: Number(page),
+          pageSize: Number(pageSize),
+          total,
+          pageCount: Math.ceil(total / Number(pageSize)),
+        },
+      });
+    } catch (error: any) {
+      strapi.log.error('Get archived orders error:', error);
+      return ctx.internalServerError('Failed to get archived orders', { error: error.message });
+    }
+  },
+
+  // Admin: Restore an archived order back to the main admin view
+  async restoreOrder(ctx: Context) {
+    if (!await isAdmin(ctx)) {
+      return ctx.forbidden('Admin access required');
+    }
+
+    const { id } = ctx.params;
+
+    try {
+      const order = await strapi.entityService.findOne('api::order.order', id);
+      if (!order) {
+        return ctx.notFound('Order not found');
+      }
+
+      const updatedOrder = await strapi.entityService.update('api::order.order', id, {
+        data: { admin_hidden: false, archived_at: null } as any,
+        populate: ORDER_POPULATE_FULL,
+      });
+
+      strapi.log.info(`[ORDER RESTORED] Order ${(updatedOrder as any).order_number} restored from archive`);
+
+      return ctx.send({ order: updatedOrder });
+    } catch (error: any) {
+      strapi.log.error('Restore order error:', error);
+      return ctx.internalServerError('Failed to restore order', { error: error.message });
+    }
+  },
+
   // Admin: Update order shipping info
   async updateOrderShipping(ctx: Context) {
     if (!await isAdmin(ctx)) {
@@ -221,6 +311,7 @@ export default {
       if (updateFields.shipping_box_id !== undefined) updateData.shipping_box = updateFields.shipping_box_id;
       if (updateFields.admin_notes !== undefined) updateData.admin_notes = updateFields.admin_notes;
       if (updateFields.admin_hidden !== undefined) updateData.admin_hidden = updateFields.admin_hidden;
+      if (updateFields.archived_at !== undefined) updateData.archived_at = updateFields.archived_at;
 
       if (Object.keys(updateData).length === 0) {
         return ctx.badRequest('No valid fields to update');

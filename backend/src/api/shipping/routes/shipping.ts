@@ -81,6 +81,22 @@ export default {
     },
     {
       method: 'GET',
+      path: '/shipping/admin/archived-orders',
+      handler: 'shipping.getArchivedOrders',
+      config: {
+        policies: [],
+      },
+    },
+    {
+      method: 'POST',
+      path: '/shipping/admin/orders/:id/restore',
+      handler: 'shipping.restoreOrder',
+      config: {
+        policies: [],
+      },
+    },
+    {
+      method: 'GET',
       path: '/shipping/admin/orders/:id/package',
       handler: 'shipping.calculateOrderPackage',
       config: {
