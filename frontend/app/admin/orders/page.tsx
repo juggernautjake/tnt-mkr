@@ -15,9 +15,11 @@ import {
   PendingStatusChange,
   ShippingBox,
   UpdateStatusBody,
+  LabelRate,
   UNIFIED_STATUS_OPTIONS,
   STATUS_LABELS,
   STATUS_EMAIL_INFO,
+  POST_PACKAGED_STATUSES,
   getStatusBorderClass,
   formatDate,
   formatCurrency,
@@ -81,6 +83,7 @@ export default function AdminOrdersPage() {
   const [showClearConfirmModal, setShowClearConfirmModal] = useState(false);
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [showCustomMessageModal, setShowCustomMessageModal] = useState(false);
+  const [showLabelModal, setShowLabelModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [packageCalc, setPackageCalc] = useState<PackageCalculation | null>(null);
   const [packageLoading, setPackageLoading] = useState(false);
@@ -95,6 +98,11 @@ export default function AdminOrdersPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [syncResult, setSyncResult] = useState<{ count: number; url?: string; failed?: number } | null>(null);
   const [syncLoading, setSyncLoading] = useState(false);
+  const [labelRates, setLabelRates] = useState<LabelRate[]>([]);
+  const [labelShipmentId, setLabelShipmentId] = useState('');
+  const [labelLoading, setLabelLoading] = useState(false);
+  const [labelBuying, setLabelBuying] = useState(false);
+  const [labelResult, setLabelResult] = useState<{ label_url: string; tracking_number: string; carrier: string; service: string; rate: number } | null>(null);
   const [refreshingTracking, setRefreshingTracking] = useState(false);
   const [updatingStatusOrderId, setUpdatingStatusOrderId] = useState<number | null>(null);
   const [packageForm, setPackageForm] = useState({
@@ -399,6 +407,7 @@ export default function AdminOrdersPage() {
       const body: UpdateStatusBody = {
         order_status: pendingStatusChange.newStatus,
         send_email: sendEmailOnStatusChange,
+        force: true,
       };
       
       // If changing to shipped and tracking number provided
@@ -711,6 +720,121 @@ export default function AdminOrdersPage() {
     }
   };
 
+  // ─── Shipping Label Functions ───────────────────────────────────
+  const openLabelModal = async (order: Order) => {
+    setSelectedOrder(order);
+    setShowLabelModal(true);
+    setLabelRates([]);
+    setLabelShipmentId('');
+    setLabelResult(null);
+
+    // If label already purchased, just show it
+    if (order.label_url) {
+      setLabelResult({
+        label_url: order.label_url,
+        tracking_number: order.tracking_number || '',
+        carrier: order.carrier_service || 'USPS',
+        service: '',
+        rate: 0,
+      });
+      return;
+    }
+
+    // Fetch rates for label purchase
+    setLabelLoading(true);
+    try {
+      const token = getAdminToken();
+      const response = await fetch(`${API_URL}/api/shipping/admin/orders/${order.id}/label-rates`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || 'Failed to get label rates');
+      }
+
+      const data = await response.json();
+      setLabelRates(data.rates || []);
+      setLabelShipmentId(data.shipment_id || '');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      alert(`Error getting label rates: ${errorMessage}`);
+      setShowLabelModal(false);
+    } finally {
+      setLabelLoading(false);
+    }
+  };
+
+  const handleBuyLabel = async (rateId: string) => {
+    if (!selectedOrder || !labelShipmentId) return;
+
+    setLabelBuying(true);
+    try {
+      const token = getAdminToken();
+      const response = await fetch(`${API_URL}/api/shipping/admin/orders/${selectedOrder.id}/buy-label`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          shipment_id: labelShipmentId,
+          rate_id: rateId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || 'Failed to purchase label');
+      }
+
+      const data = await response.json();
+      setLabelResult({
+        label_url: data.label_url,
+        tracking_number: data.tracking_number,
+        carrier: data.carrier,
+        service: data.service,
+        rate: data.rate,
+      });
+      fetchOrders();
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      alert(`Error purchasing label: ${errorMessage}`);
+    } finally {
+      setLabelBuying(false);
+    }
+  };
+
+  const handlePrintLabel = (labelUrl: string) => {
+    const printWindow = window.open(labelUrl, '_blank');
+    if (printWindow) {
+      printWindow.addEventListener('load', () => {
+        printWindow.print();
+      });
+    }
+  };
+
+  const handleDownloadLabel = async (labelUrl: string, orderNumber: string) => {
+    try {
+      const response = await fetch(labelUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const ext = labelUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png';
+      a.download = `label-${orderNumber}.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch {
+      window.open(labelUrl, '_blank');
+    }
+  };
+
   const handleDeleteSelected = () => {
     if (selectedOrderIds.length > 0) {
       setShowDeleteConfirmModal(true);
@@ -847,12 +971,15 @@ export default function AdminOrdersPage() {
             <button onClick={() => setShowBulkTrackingModal(true)} className={styles.actionBtn}>
               📦 Bulk Add Tracking
             </button>
-            <button 
-              onClick={handleRefreshAllTracking} 
+            <button
+              onClick={handleRefreshAllTracking}
               className={styles.actionBtn}
               disabled={refreshingTracking}
             >
               {refreshingTracking ? '🔄 Refreshing...' : '🔄 Refresh All Tracking'}
+            </button>
+            <button onClick={() => router.push('/admin/analytics')} className={styles.analyticsLink}>
+              📊 Analytics
             </button>
           </div>
           <button onClick={handleLogout} className={styles.logoutBtn}>
@@ -1018,11 +1145,17 @@ export default function AdminOrdersPage() {
                     <button onClick={() => openCustomMessageModal(order)} className={styles.orderActionBtn}>
                       💬 Message
                     </button>
-                    {!order.tracking_number && (
+                    {!order.tracking_number && !POST_PACKAGED_STATUSES.includes(order.order_status) && (
                       <button onClick={() => openTrackingModal(order)} className={`${styles.orderActionBtn} ${styles.primaryBtn}`}>
                         🚚 Add Tracking
                       </button>
                     )}
+                    <button
+                      onClick={() => openLabelModal(order)}
+                      className={`${styles.orderActionBtn} ${order.label_url || POST_PACKAGED_STATUSES.includes(order.order_status) ? styles.labelBtnGreen : styles.labelBtnPurple}`}
+                    >
+                      {order.label_url || POST_PACKAGED_STATUSES.includes(order.order_status) ? '🏷️ View Label' : '🏷️ Buy Label'}
+                    </button>
                   </div>
                 </div>
               );
@@ -1652,6 +1785,115 @@ export default function AdminOrdersPage() {
                 💬 Send Message
               </button>
               <button onClick={() => setShowOrderDetailModal(false)} className={styles.submitBtn}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Shipping Label Modal */}
+      {showLabelModal && selectedOrder && (
+        <div className={styles.modalOverlay} onClick={() => !labelBuying && setShowLabelModal(false)}>
+          <div className={styles.modalLarge} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>🏷️ Shipping Label - {selectedOrder.order_number}</h2>
+              {!labelBuying && (
+                <button onClick={() => setShowLabelModal(false)} className={styles.closeBtn}>×</button>
+              )}
+            </div>
+            <div className={styles.modalBody}>
+              {labelLoading ? (
+                <div className={styles.loadingWrapper}>
+                  <div className={styles.spinner}></div>
+                  <p>Getting shipping rates...</p>
+                </div>
+              ) : labelResult ? (
+                /* Label purchased or already exists - show print/download options */
+                <div className={styles.labelResultSection}>
+                  <div className={styles.labelSuccessHeader}>
+                    <span className={styles.labelSuccessIcon}>✅</span>
+                    <h3>Label Ready</h3>
+                  </div>
+                  {labelResult.tracking_number && (
+                    <div className={styles.labelInfoRow}>
+                      <strong>Tracking:</strong> {labelResult.tracking_number}
+                    </div>
+                  )}
+                  {labelResult.carrier && (
+                    <div className={styles.labelInfoRow}>
+                      <strong>Carrier:</strong> {labelResult.carrier} {labelResult.service}
+                    </div>
+                  )}
+                  {labelResult.rate > 0 && (
+                    <div className={styles.labelInfoRow}>
+                      <strong>Cost:</strong> ${labelResult.rate.toFixed(2)}
+                    </div>
+                  )}
+                  <div className={styles.labelActions}>
+                    <button
+                      onClick={() => handlePrintLabel(labelResult.label_url)}
+                      className={styles.labelActionBtn}
+                    >
+                      🖨️ Print Label
+                    </button>
+                    <button
+                      onClick={() => handleDownloadLabel(labelResult.label_url, selectedOrder.order_number)}
+                      className={styles.labelActionBtn}
+                    >
+                      💾 Download
+                    </button>
+                    <button
+                      onClick={() => window.open(labelResult.label_url, '_blank')}
+                      className={styles.labelActionBtn}
+                    >
+                      🔗 Open in New Tab
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Show rates for label purchase */
+                <>
+                  <p style={{ marginBottom: '16px' }}>
+                    Select a shipping service to purchase a label for this order:
+                  </p>
+                  {labelRates.length === 0 ? (
+                    <div className={styles.emptyState}>
+                      <p>No rates available. Make sure the order has a shipping address and package dimensions.</p>
+                    </div>
+                  ) : (
+                    <div className={styles.labelRatesList}>
+                      {labelRates.map((rate) => (
+                        <div key={rate.id} className={styles.labelRateCard}>
+                          <div className={styles.labelRateInfo}>
+                            <span className={styles.labelRateService}>{rate.carrier} {rate.service}</span>
+                            <span className={styles.labelRatePrice}>${rate.rate.toFixed(2)}</span>
+                          </div>
+                          {(rate.delivery_days || rate.est_delivery_days) && (
+                            <span className={styles.labelRateDays}>
+                              Est. {rate.delivery_days || rate.est_delivery_days} business days
+                            </span>
+                          )}
+                          <button
+                            onClick={() => handleBuyLabel(rate.id)}
+                            disabled={labelBuying}
+                            className={styles.buyLabelBtn}
+                          >
+                            {labelBuying ? 'Purchasing...' : 'Purchase Label'}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                onClick={() => setShowLabelModal(false)}
+                className={styles.cancelBtn}
+                disabled={labelBuying}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

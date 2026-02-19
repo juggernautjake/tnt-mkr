@@ -96,6 +96,22 @@ export default {
       },
     },
     {
+      method: 'GET',
+      path: '/shipping/admin/orders/:id/label-rates',
+      handler: 'shipping.getLabelRates',
+      config: {
+        policies: [],
+      },
+    },
+    {
+      method: 'POST',
+      path: '/shipping/admin/orders/:id/buy-label',
+      handler: 'shipping.buyLabel',
+      config: {
+        policies: [],
+      },
+    },
+    {
       method: 'POST',
       path: '/shipping/admin/export-pirate-ship',
       handler: 'shipping.exportForPirateShip',
