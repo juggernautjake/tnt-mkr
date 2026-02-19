@@ -1916,6 +1916,226 @@
   line-height: 1.6;
 }
 
+/* ==================== SHIPPING LABEL STYLES ==================== */
+
+/* Label button variants */
+.labelBtnPurple {
+  background: #7c3aed !important;
+  color: white !important;
+  border-color: #7c3aed !important;
+}
+
+.labelBtnPurple:hover {
+  background: #6d28d9 !important;
+  border-color: #6d28d9 !important;
+}
+
+.labelBtnGreen {
+  background: #16a34a !important;
+  color: white !important;
+  border-color: #16a34a !important;
+}
+
+.labelBtnGreen:hover {
+  background: #15803d !important;
+  border-color: #15803d !important;
+}
+
+/* Label result section */
+.labelResultSection {
+  text-align: center;
+}
+
+.labelSuccessHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.labelSuccessIcon {
+  font-size: 32px;
+}
+
+.labelSuccessHeader h3 {
+  margin: 0;
+  color: #16a34a;
+  font-size: 22px;
+}
+
+:global(.dark) .labelSuccessHeader h3 {
+  color: #4ade80;
+}
+
+.labelInfoRow {
+  padding: 8px 16px;
+  margin-bottom: 8px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+  text-align: left;
+}
+
+:global(.dark) .labelInfoRow {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ddd;
+}
+
+.labelActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.labelActionBtn {
+  padding: 12px 24px;
+  background: #fe5100;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.labelActionBtn:hover {
+  transform: scale(1.05);
+  background: #d94500;
+}
+
+:global(.dark) .labelActionBtn {
+  background: #24b6ff;
+}
+
+:global(.dark) .labelActionBtn:hover {
+  background: #1a8ed1;
+}
+
+/* Label rates list */
+.labelRatesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.labelRateCard {
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  transition: border-color 0.2s;
+}
+
+.labelRateCard:hover {
+  border-color: #7c3aed;
+}
+
+:global(.dark) .labelRateCard {
+  border-color: #444;
+}
+
+:global(.dark) .labelRateCard:hover {
+  border-color: #a78bfa;
+}
+
+.labelRateInfo {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 200px;
+}
+
+.labelRateService {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}
+
+:global(.dark) .labelRateService {
+  color: #fff;
+}
+
+.labelRatePrice {
+  font-size: 20px;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+:global(.dark) .labelRatePrice {
+  color: #4ade80;
+}
+
+.labelRateDays {
+  font-size: 13px;
+  color: #666;
+}
+
+:global(.dark) .labelRateDays {
+  color: #aaa;
+}
+
+.buyLabelBtn {
+  padding: 10px 20px;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.buyLabelBtn:hover:not(:disabled) {
+  background: #6d28d9;
+  transform: scale(1.02);
+}
+
+.buyLabelBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ==================== ANALYTICS LINK ==================== */
+
+.analyticsLink {
+  padding: 10px 18px;
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.analyticsLink:hover {
+  transform: scale(1.05);
+  background: #7c3aed;
+}
+
+:global(.dark) .analyticsLink {
+  background: #a78bfa;
+}
+
+:global(.dark) .analyticsLink:hover {
+  background: #8b5cf6;
+}
+
 /* ==================== RESPONSIVE ==================== */
 
 @media (max-width: 1024px) {

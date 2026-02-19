@@ -312,6 +312,103 @@ const easypostService = {
   },
 
   /**
+   * Buy a shipping label for a shipment
+   * Requires a shipment_id and rate_id from a previous createShipment call
+   */
+  async buyLabel(shipmentId: string, rateId: string): Promise<{
+    tracking_number: string;
+    label_url: string;
+    label_format: string;
+    carrier: string;
+    service: string;
+    rate: number;
+    tracker_id: string;
+  }> {
+    try {
+      const client = getClient();
+
+      const shipment = await client.Shipment.retrieve(shipmentId);
+      const purchased = await client.Shipment.buy(shipment.id, rateId);
+
+      const labelUrl = purchased.postage_label?.label_url || '';
+      const labelFormat = purchased.postage_label?.label_file_type || 'PNG';
+
+      return {
+        tracking_number: purchased.tracking_code || '',
+        label_url: labelUrl,
+        label_format: labelFormat,
+        carrier: purchased.selected_rate?.carrier || 'USPS',
+        service: purchased.selected_rate?.service || '',
+        rate: parseFloat(purchased.selected_rate?.rate || '0'),
+        tracker_id: purchased.tracker?.id || '',
+      };
+    } catch (error: any) {
+      strapi.log.error('EasyPost buy label error:', error);
+      throw new Error(error.message || 'Failed to purchase shipping label');
+    }
+  },
+
+  /**
+   * Create a shipment and return it along with rates (for label purchasing flow)
+   * This creates a new shipment even if one already exists, to get fresh rates
+   */
+  async createShipmentForLabel(
+    fromAddress: AddressInput,
+    toAddress: AddressInput,
+    parcel: { weight_oz: number; length: number; width: number; height: number }
+  ) {
+    try {
+      const client = getClient();
+
+      const shipment = await client.Shipment.create({
+        from_address: {
+          street1: fromAddress.street,
+          street2: fromAddress.street2 || '',
+          city: fromAddress.city,
+          state: fromAddress.state,
+          zip: fromAddress.postal_code,
+          country: 'US',
+          phone: fromAddress.phone || '',
+          name: fromAddress.name || 'TNT MKR',
+          company: fromAddress.company || 'TNT MKR',
+        },
+        to_address: {
+          street1: toAddress.street,
+          street2: toAddress.street2 || '',
+          city: toAddress.city,
+          state: toAddress.state,
+          zip: toAddress.postal_code,
+          country: 'US',
+          phone: toAddress.phone || '',
+          name: toAddress.name || '',
+        },
+        parcel: {
+          weight: parcel.weight_oz,
+          length: parcel.length,
+          width: parcel.width,
+          height: parcel.height,
+        },
+      });
+
+      return {
+        shipment_id: shipment.id,
+        rates: shipment.rates?.map((rate: any) => ({
+          id: rate.id,
+          carrier: rate.carrier,
+          service: rate.service,
+          rate: parseFloat(rate.rate),
+          delivery_days: rate.delivery_days,
+          delivery_date: rate.delivery_date,
+          est_delivery_days: rate.est_delivery_days,
+        })) || [],
+      };
+    } catch (error: any) {
+      strapi.log.error('EasyPost create shipment for label error:', error);
+      throw new Error(error.message || 'Failed to create shipment for label');
+    }
+  },
+
+  /**
    * Get the origin address from environment variables
    */
   getOriginAddress(): AddressInput {

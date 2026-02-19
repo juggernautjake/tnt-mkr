@@ -253,16 +253,18 @@ export default {
     }
 
     const { id } = ctx.params;
-    const { 
-      order_status, 
-      tracking_number, 
+    const {
+      order_status,
+      tracking_number,
       carrier_service,
-      send_email = false
-    } = ctx.request.body as { 
+      send_email = false,
+      force = false,
+    } = ctx.request.body as {
       order_status: string;
       tracking_number?: string;
       carrier_service?: string;
       send_email?: boolean;
+      force?: boolean;
     };
 
     if (!order_status || !ALL_ORDER_STATUSES.includes(order_status as OrderStatus)) {
@@ -280,11 +282,12 @@ export default {
 
       const previousStatus = order.order_status as OrderStatus;
 
-      // Enforce state machine — prevent invalid transitions
-      if (previousStatus && !isValidTransition(previousStatus, order_status as OrderStatus)) {
+      // Enforce state machine — prevent invalid transitions (unless force is true)
+      if (!force && previousStatus && !isValidTransition(previousStatus, order_status as OrderStatus)) {
         return ctx.badRequest(
           `Invalid status transition: "${previousStatus}" → "${order_status}". ` +
-          `Allowed transitions from "${previousStatus}": ${(VALID_TRANSITIONS[previousStatus] || []).join(', ') || 'none (terminal state)'}`
+          `Allowed transitions from "${previousStatus}": ${(VALID_TRANSITIONS[previousStatus] || []).join(', ') || 'none (terminal state)'}. ` +
+          `Pass force: true to override.`
         );
       }
 
@@ -1051,6 +1054,184 @@ export default {
     } catch (error: any) {
       strapi.log.error('Calculate order package error:', error);
       return ctx.internalServerError('Failed to calculate package', { error: error.message });
+    }
+  },
+
+  // Admin: Get shipping label rates for an order
+  async getLabelRates(ctx: Context) {
+    if (!await isAdmin(ctx)) {
+      return ctx.forbidden('Admin access required');
+    }
+
+    const { id } = ctx.params;
+
+    try {
+      const order = await strapi.entityService.findOne('api::order.order', id, {
+        populate: {
+          shipping_address: true,
+          shipping_box: true,
+          order_items: {
+            populate: {
+              product: { fields: ['id', 'name', 'weight_oz', 'length', 'width', 'height'] },
+              order_item_parts: {
+                populate: {
+                  product_part: { fields: ['id', 'name', 'weight_oz', 'length', 'width', 'height'] },
+                },
+              },
+            },
+          },
+        },
+      }) as any;
+
+      if (!order) {
+        return ctx.notFound('Order not found');
+      }
+
+      if (!order.shipping_address) {
+        return ctx.badRequest('Order has no shipping address');
+      }
+
+      // Use saved package dimensions if available, otherwise calculate
+      let parcel: { weight_oz: number; length: number; width: number; height: number };
+
+      if (order.package_weight_oz && order.package_length) {
+        parcel = {
+          weight_oz: order.package_weight_oz,
+          length: order.package_length,
+          width: order.package_width || 6,
+          height: order.package_height || 3,
+        };
+      } else {
+        // Calculate from order items
+        const boxes = await strapi.entityService.findMany('api::shipping-box.shipping-box' as any, {
+          filters: { is_active: true },
+          sort: { priority: 'asc' },
+        });
+
+        const cartItems = order.order_items.map((item: any) => ({
+          product: item.product,
+          quantity: item.quantity,
+          is_additional_part: item.is_additional_part,
+          cart_item_parts: item.order_item_parts?.map((oip: any) => ({
+            product_part: oip.product_part,
+          })) || [],
+        }));
+
+        const packages = await shippingCalculator.calculatePackages(cartItems, boxes as any);
+
+        if (packages.length > 0) {
+          parcel = {
+            weight_oz: packages[0].weight_oz,
+            length: packages[0].length,
+            width: packages[0].width,
+            height: packages[0].height,
+          };
+        } else {
+          parcel = { weight_oz: 8, length: 8, width: 6, height: 3 };
+        }
+      }
+
+      const fromAddress = easypostService.getOriginAddress();
+      const toAddress = {
+        street: order.shipping_address.street,
+        street2: order.shipping_address.street2 || '',
+        city: order.shipping_address.city,
+        state: order.shipping_address.state,
+        postal_code: order.shipping_address.postal_code,
+        phone: order.shipping_address.phone || '',
+        name: order.customer_name || '',
+      };
+
+      const result = await easypostService.createShipmentForLabel(fromAddress, toAddress, parcel);
+
+      // Save shipment_id on order for later label purchase
+      await strapi.entityService.update('api::order.order', id, {
+        data: { easypost_shipment_id: result.shipment_id },
+      });
+
+      // Filter to USPS only and sort
+      const uspsRates = result.rates
+        .filter((r: any) => r.carrier === 'USPS')
+        .sort((a: any, b: any) => a.rate - b.rate);
+
+      return ctx.send({
+        shipment_id: result.shipment_id,
+        rates: uspsRates,
+        parcel,
+        to_address: toAddress,
+      });
+    } catch (error: any) {
+      strapi.log.error('Get label rates error:', error);
+      return ctx.internalServerError('Failed to get label rates', { error: error.message });
+    }
+  },
+
+  // Admin: Purchase a shipping label for an order
+  async buyLabel(ctx: Context) {
+    if (!await isAdmin(ctx)) {
+      return ctx.forbidden('Admin access required');
+    }
+
+    const { id } = ctx.params;
+    const { shipment_id, rate_id } = ctx.request.body as { shipment_id: string; rate_id: string };
+
+    if (!shipment_id || !rate_id) {
+      return ctx.badRequest('shipment_id and rate_id are required');
+    }
+
+    try {
+      const order = await strapi.entityService.findOne('api::order.order', id, {
+        populate: ORDER_POPULATE_FULL,
+      }) as any;
+
+      if (!order) {
+        return ctx.notFound('Order not found');
+      }
+
+      if (order.label_url) {
+        return ctx.badRequest('A label has already been purchased for this order');
+      }
+
+      const labelResult = await easypostService.buyLabel(shipment_id, rate_id);
+
+      const updateData: any = {
+        label_url: labelResult.label_url,
+        label_format: labelResult.label_format,
+        label_purchased_at: new Date().toISOString(),
+        tracking_number: labelResult.tracking_number,
+        carrier_service: `${labelResult.carrier} ${labelResult.service}`,
+        easypost_shipment_id: shipment_id,
+      };
+
+      if (labelResult.tracker_id) {
+        updateData.easypost_tracker_id = labelResult.tracker_id;
+      }
+
+      const updatedOrder = await strapi.entityService.update('api::order.order', id, {
+        data: updateData,
+        populate: ORDER_POPULATE_FULL,
+      });
+
+      try {
+        await googleSheets.upsertOrder(updatedOrder as any);
+      } catch (sheetError) {
+        strapi.log.error('Failed to update Google Sheet after label purchase:', sheetError);
+      }
+
+      strapi.log.info(`[LABEL PURCHASED] Order ${order.order_number}: Label purchased via ${labelResult.carrier} ${labelResult.service}, tracking: ${labelResult.tracking_number}`);
+
+      return ctx.send({
+        order: updatedOrder,
+        label_url: labelResult.label_url,
+        label_format: labelResult.label_format,
+        tracking_number: labelResult.tracking_number,
+        carrier: labelResult.carrier,
+        service: labelResult.service,
+        rate: labelResult.rate,
+      });
+    } catch (error: any) {
+      strapi.log.error('Buy label error:', error);
+      return ctx.internalServerError('Failed to purchase shipping label', { error: error.message });
     }
   },
 

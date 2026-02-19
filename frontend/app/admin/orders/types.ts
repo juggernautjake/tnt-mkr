@@ -61,7 +61,24 @@ export interface Order {
   admin_hidden?: boolean;
   shipping_notification_sent?: boolean;
   user?: { id: number; email: string };
+  label_url?: string;
+  label_format?: string;
+  label_purchased_at?: string;
+  easypost_shipment_id?: string;
 }
+
+export interface LabelRate {
+  id: string;
+  carrier: string;
+  service: string;
+  rate: number;
+  delivery_days?: number;
+  delivery_date?: string;
+  est_delivery_days?: number;
+}
+
+// Statuses that indicate the order is past the packaged stage
+export const POST_PACKAGED_STATUSES = ['shipped', 'in_transit', 'out_for_delivery', 'delivered'];
 
 export interface PackageCalculation {
   calculated_packages: Array<{
@@ -104,6 +121,7 @@ export interface UpdateStatusBody {
   send_email: boolean;
   tracking_number?: string;
   carrier_service?: string;
+  force?: boolean;
 }
 
 // Unified status options combining packing and shipping stages

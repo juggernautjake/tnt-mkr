@@ -204,6 +204,18 @@
       "type": "boolean",
       "default": false,
       "description": "If true, order is hidden from admin orders page but still visible in Strapi"
+    },
+    "label_url": {
+      "type": "text",
+      "description": "URL to the purchased shipping label (PNG or PDF)"
+    },
+    "label_format": {
+      "type": "string",
+      "description": "Format of the shipping label (PNG, PDF, ZPL)"
+    },
+    "label_purchased_at": {
+      "type": "datetime",
+      "description": "When the shipping label was purchased"
     }
   }
 }
