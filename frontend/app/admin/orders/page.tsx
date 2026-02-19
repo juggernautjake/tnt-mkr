@@ -178,9 +178,9 @@ export default function AdminOrdersPage() {
       }
 
       const data = await response.json();
-      // Filter out hidden orders
-      const allOrders = (data.orders || []).filter((o: Order) => !o.admin_hidden);
-      
+      // Backend already excludes archived orders (admin_hidden), no client-side filter needed
+      const allOrders = data.orders || [];
+
       const activeOrders = allOrders.filter((o: Order) => o.order_status !== 'delivered');
       const delivered = allOrders.filter((o: Order) => o.order_status === 'delivered');
       
@@ -235,7 +235,7 @@ export default function AdminOrdersPage() {
       
       if (response.ok) {
         const data = await response.json();
-        const newDelivered = (data.orders || []).filter((o: Order) => !o.admin_hidden);
+        const newDelivered = data.orders || [];
         setDeliveredOrders(prev => [...prev, ...newDelivered]);
         setDeliveredPage(prev => prev + 1);
         setHasMoreDelivered(newDelivered.length === 10);
@@ -856,7 +856,7 @@ export default function AdminOrdersPage() {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ admin_hidden: true }),
+            body: JSON.stringify({ admin_hidden: true, archived_at: new Date().toISOString() }),
           });
 
           if (response.ok) {
@@ -872,11 +872,11 @@ export default function AdminOrdersPage() {
       setShowDeleteConfirmModal(false);
       setSelectedOrderIds([]);
       fetchOrders();
-      
+
       if (failCount === 0) {
-        alert(`Successfully hidden ${successCount} order(s) from admin view.`);
+        alert(`Successfully archived ${successCount} order(s). View them in the Archived Orders section.`);
       } else {
-        alert(`Hidden ${successCount} order(s). Failed to hide ${failCount} order(s).`);
+        alert(`Archived ${successCount} order(s). Failed to archive ${failCount} order(s).`);
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
@@ -980,6 +980,9 @@ export default function AdminOrdersPage() {
             </button>
             <button onClick={() => router.push('/admin/analytics')} className={styles.analyticsLink}>
               📊 Analytics
+            </button>
+            <button onClick={() => router.push('/admin/archived')} className={styles.actionBtn}>
+              🗄️ Archived Orders
             </button>
           </div>
           <button onClick={handleLogout} className={styles.logoutBtn}>

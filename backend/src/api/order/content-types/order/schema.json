@@ -203,7 +203,11 @@
     "admin_hidden": {
       "type": "boolean",
       "default": false,
-      "description": "If true, order is hidden from admin orders page but still visible in Strapi"
+      "description": "If true, order is archived and hidden from admin orders page"
+    },
+    "archived_at": {
+      "type": "datetime",
+      "description": "When the order was archived/hidden from the admin panel"
     },
     "label_url": {
       "type": "text",

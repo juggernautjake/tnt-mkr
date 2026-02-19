@@ -4,9 +4,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './analytics.module.css';
 
+interface HexCode {
+  hex_code: string;
+  name?: string;
+}
+
 interface OrderItemPart {
   product_part: { id: number; name: string };
-  color: { id: number; name: string; hex_code?: string };
+  color: { id: number; name: string; hex_codes?: HexCode[]; type?: string };
 }
 
 interface OrderItem {
@@ -32,6 +37,8 @@ interface ColorStat {
   colorId: number;
   colorName: string;
   hexCode?: string;
+  hexCodes?: HexCode[];
+  colorType?: string;
   count: number;
   percentage: number;
 }
@@ -188,7 +195,9 @@ export default function AnalyticsPage() {
           const partName = oip.product_part?.name || 'Unknown Part';
           const colorId = oip.color?.id;
           const colorName = oip.color?.name || 'Unknown Color';
-          const hexCode = (oip.color as any)?.hex_code;
+          const hexCodesArr = oip.color?.hex_codes || [];
+          const primaryHex = hexCodesArr.length > 0 ? hexCodesArr[0].hex_code : undefined;
+          const colorType = oip.color?.type;
 
           if (!partId || !colorId) continue;
           uniqueColors.add(colorName);
@@ -203,7 +212,7 @@ export default function AnalyticsPage() {
 
           let colorStat = partStat.colors.find((c) => c.colorId === colorId);
           if (!colorStat) {
-            colorStat = { colorId, colorName, hexCode, count: 0, percentage: 0 };
+            colorStat = { colorId, colorName, hexCode: primaryHex, hexCodes: hexCodesArr, colorType, count: 0, percentage: 0 };
             partStat.colors.push(colorStat);
           }
           colorStat.count += item.quantity;
@@ -230,11 +239,11 @@ export default function AnalyticsPage() {
   const { productStats, totalUnits, totalRevenue, uniqueColors } = buildAnalytics();
 
   // Build global top colors
-  const globalColorCounts = new Map<string, { count: number; hexCode?: string }>();
+  const globalColorCounts = new Map<string, { count: number; hexCode?: string; hexCodes?: HexCode[]; colorType?: string }>();
   for (const product of productStats) {
     for (const part of product.parts) {
       for (const color of part.colors) {
-        const existing = globalColorCounts.get(color.colorName) || { count: 0, hexCode: color.hexCode };
+        const existing = globalColorCounts.get(color.colorName) || { count: 0, hexCode: color.hexCode, hexCodes: color.hexCodes, colorType: color.colorType };
         existing.count += color.count;
         globalColorCounts.set(color.colorName, existing);
       }
@@ -343,15 +352,23 @@ export default function AnalyticsPage() {
                               {part.partName} ({part.totalSelections} selections)
                             </h4>
                             {part.colors.map((color, colorIdx) => {
-                              const barColor = BAR_COLORS[colorIdx % BAR_COLORS.length];
+                              const fallbackColor = BAR_COLORS[colorIdx % BAR_COLORS.length];
                               const isTop = colorIdx === 0 && part.colors.length > 1;
+                              // Use actual product color hex codes for bar
+                              const hexList = (color.hexCodes || []).map(h => h.hex_code).filter(Boolean);
+                              const barBackground = color.colorType === 'rainbow' && hexList.length >= 2
+                                ? `linear-gradient(to right, ${hexList.join(', ')})`
+                                : hexList[0] || fallbackColor;
+                              const swatchBackground = color.colorType === 'rainbow' && hexList.length >= 2
+                                ? `linear-gradient(to right, ${hexList.join(', ')})`
+                                : hexList[0] || undefined;
                               return (
                                 <div key={color.colorId} className={styles.colorBarRow}>
                                   <span className={styles.colorName}>
-                                    {color.hexCode && (
+                                    {swatchBackground && (
                                       <span
                                         className={styles.colorSwatch}
-                                        style={{ backgroundColor: color.hexCode }}
+                                        style={{ background: swatchBackground }}
                                       ></span>
                                     )}
                                     {color.colorName}
@@ -362,7 +379,7 @@ export default function AnalyticsPage() {
                                       className={styles.colorBar}
                                       style={{
                                         width: `${color.percentage}%`,
-                                        backgroundColor: color.hexCode || barColor,
+                                        background: barBackground,
                                       }}
                                     ></div>
                                   </div>
@@ -400,23 +417,29 @@ export default function AnalyticsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {topGlobalColors.map((color, idx) => (
-                      <tr key={color.name}>
-                        <td>
-                          <span className={styles.rankBadge}>{idx + 1}</span>
-                        </td>
-                        <td>
-                          {color.hexCode && (
-                            <span
-                              className={styles.colorSwatch}
-                              style={{ backgroundColor: color.hexCode }}
-                            ></span>
-                          )}
-                          {color.name}
-                        </td>
-                        <td>{color.count}</td>
-                      </tr>
-                    ))}
+                    {topGlobalColors.map((color, idx) => {
+                      const hexList = (color.hexCodes || []).map(h => h.hex_code).filter(Boolean);
+                      const swatchBg = color.colorType === 'rainbow' && hexList.length >= 2
+                        ? `linear-gradient(to right, ${hexList.join(', ')})`
+                        : hexList[0] || undefined;
+                      return (
+                        <tr key={color.name}>
+                          <td>
+                            <span className={styles.rankBadge}>{idx + 1}</span>
+                          </td>
+                          <td>
+                            {swatchBg && (
+                              <span
+                                className={styles.colorSwatch}
+                                style={{ background: swatchBg }}
+                              ></span>
+                            )}
+                            {color.name}
+                          </td>
+                          <td>{color.count}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
